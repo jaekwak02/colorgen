@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { BrowserRouter, Route } from 'react-router-dom';
 import 'normalize.css';
+import './transitions.css';
 
 import HomePage from '../HomePage/HomePage';
 import ColorThemeGenerator from '../ColorThemeGenerator/ColorThemeGenerator';
@@ -20,6 +21,26 @@ const GlobalStyle = createGlobalStyle`
     --color-light-primary: #01BAEF;
     --color-light-background: #fbfbff;
     --color-light-foreground: #333333;
+
+    color-b-L90: #f0fffe;
+    color-b-L80: #e1fffc;
+    color-b-L70: #d2fefb;
+    color-b-L60: #c3fef9;
+    color-b-L50: #b4fef8;
+    color-b-L40: #a4fef7;
+    color-b-L30: #95fef5;
+    color-b-L20: #86fdf4;
+    color-b-L10: #77fdf2;
+    color-b: #68fdf1;
+    color-b-D10: #5ee4d9;
+    color-b-D20: #53cac1;
+    color-b-D30: #49b1a9;
+    color-b-D40: #3e9891;
+    color-b-D50: #347f79;
+    color-b-D60: #2a6560;
+    color-b-D70: #1f4c48;
+    color-b-D80: #153330;
+    color-b-D90: #0a1918;
 
     --color-neutral-1: #333333;
     --color-dark-foreground: #fbfbff;

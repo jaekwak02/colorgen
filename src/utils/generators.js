@@ -96,17 +96,17 @@ export const generateTetradic = () => {
 		}),
 		new Color({
 			h: h1,
-			s: randomNumber(5, 20),
+			s: randomNumber(10, 20),
 			l: randomNumber(40, 90)
 		}),
 		new Color({
 			h: h2,
-			s: randomNumber(5, 20),
+			s: randomNumber(10, 20),
 			l: randomNumber(40, 90)
 		}),
 		new Color({
 			h: h3,
-			s: randomNumber(5, 20),
+			s: randomNumber(10, 20),
 			l: randomNumber(40, 90)
 		})
 	];

@@ -4,6 +4,7 @@ import ColorSelection from './ColorSelection';
 import GeneratorContext from './GeneratorContext';
 import GeneratedColorView from './GeneratedColorView';
 // import ColorThemeDemo from './ColorThemeDemo';
+import TintsAndShadesVisualizer from './TintsAndShadesVisualizer';
 import Randomizer from './Randomizer';
 import SliderGroup from './SliderGroup';
 
@@ -245,6 +246,8 @@ function ColorThemeGenerator() {
 					</div>
 				</ContainerInnerDiv>
 				<div style={{ height: 200 }} />
+
+				<TintsAndShadesVisualizer />
 
 				{/* <ColorThemeDemo /> */}
 			</ColorThemeGeneratorDiv>
