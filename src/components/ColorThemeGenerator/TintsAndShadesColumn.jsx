@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { generateHue, getTextDark } from '../../utils/utils';
 
@@ -8,10 +8,10 @@ const ContainerDiv = styled.div`
 `;
 
 const RowDiv = styled.div`
-	padding: 0px var(--spacing-medium);
+	padding: 2px var(--spacing-medium);
 
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr;
 	align-items: center;
 	justify-items: center;
 
@@ -25,26 +25,39 @@ const RowDiv = styled.div`
 	}
 `;
 
-function TintsAndShadesColumn({ color }) {
-	const increment10 = true;
-	const scalePre = increment10 ? [...new Array(19).keys()].map(k => k * 10 - 90) : [...new Array(39).keys()].map(k => k * 5 - 95);
-	const scale = scalePre.reverse().map(change => {
-		const newHex = generateHue(color, change);
-		const textColor = getTextDark(newHex) ? 'black' : 'white';
+function TintsAndShadesColumn({ color, increment }) {
+	const scale = useMemo(() => {
+		let c = increment;
+		let cc = 0;
+		const scalePre = [0];
+		while (c < 100 && cc < 100) {
+			scalePre.unshift(c);
+			scalePre.push(-c);
 
-		return {
-			hex: newHex,
-			textColor,
-			change: change === 0 ? '―' : `${Math.abs(change)}% ${change > 0 ? 'lighter' : 'darker'}`
-		};
-	});
+			c += increment;
+			cc++;
+		}
+
+		const scale = scalePre.map(changeValue => {
+			const newHex = generateHue(color, changeValue);
+			const textColor = getTextDark(newHex) ? 'black' : 'white';
+
+			return {
+				hex: newHex,
+				textColor,
+				change: changeValue === 0 ? '―' : `${Math.abs(changeValue)}% ${changeValue > 0 ? 'lighter' : 'darker'}`,
+				changeValue
+			};
+		});
+
+		return scale;
+	}, [color, increment]);
 
 	return (
 		<ContainerDiv>
 			{scale.map((c, i) => (
 				<RowDiv key={i} style={{ backgroundColor: c.hex, color: c.textColor }}>
 					<div>{c.change}</div>
-					<div className="view-granularity">More</div>
 					<div>{c.hex}</div>
 				</RowDiv>
 			))}

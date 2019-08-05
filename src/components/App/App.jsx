@@ -48,6 +48,7 @@ const GlobalStyle = createGlobalStyle`
     --spacing-small: 10px;
     --spacing-medium: 20px;
     --spacing-large: 30px;
+    --spacing-extra-large: 45px;
 
     --box-shadow-medium: 2px 2px 6px rgba(0, 0, 0, 0.2), 1px 1px 3px rgba(0, 0, 0, 0.4);
 
@@ -56,6 +57,10 @@ const GlobalStyle = createGlobalStyle`
     color: var(--color-light-foreground);
 
     height: 100%;
+
+    * {
+      box-sizing: border-box;
+    }
   }
 
   body {

@@ -10,20 +10,32 @@ const randomLightness = (min, max) => min + Math.floor(Math.random() * (max - mi
 
 const clampHue = hue => (hue < 0 ? hue + 360 : hue % 360);
 
-export const generateMonochromatic = () => {
-	const h = randomHue();
-	const s = randomSaturation(50, 100);
-	const l = randomLightness(50, 90);
+export const generateMonochromatic = baseColor => {
+	const c0 = baseColor
+		? new Color(baseColor)
+		: new Color({
+				h: randomHue(),
+				s: randomNumber(60, 100),
+				l: randomNumber(50, 90)
+		  });
 
-	return [new Color({ h, s, l })];
+	const c1 = new Color({
+		h: c0.hsl.h,
+		s: randomNumber(15, 50),
+		l: randomNumber(30, 70)
+	});
+
+	return [c0, c1];
 };
 
-export const generateAnalagous = () => {
-	const c2 = new Color({
-		h: randomHue(),
-		s: randomSaturation(50, 100),
-		l: randomLightness(50, 70)
-	});
+export const generateAnalagous = baseColor => {
+	const c2 = baseColor
+		? new Color(baseColor)
+		: new Color({
+				h: randomHue(),
+				s: randomSaturation(50, 100),
+				l: randomLightness(50, 70)
+		  });
 
 	const deviance = randomNumber(30, 60);
 	const s = randomNumber(20, 50);
@@ -43,31 +55,42 @@ export const generateAnalagous = () => {
 	return [c1, c2, c3];
 };
 
-export const generateComplementary = () => {
-	const h0 = randomHue();
-	const h1 = clampHue(h0 + 180);
+export const generateComplementary = baseColor => {
+	const c0 = baseColor
+		? new Color(baseColor)
+		: new Color({
+				h: randomHue(),
+				s: randomNumber(30, 70),
+				l: randomNumber(30, 70)
+		  });
 
-	const s = 30 + Math.floor(Math.random() * 40);
+	const c1 = new Color({
+		h: clampHue(c0.hsl.h + 180),
+		s: randomNumber(30, 70),
+		l: randomNumber(30, 70)
+	});
 
-	return [new Color({ h: h0, s, l: 30 }), new Color({ h: h1, s, l: 60 })];
+	return [c0, c1];
 };
 
-export const generateSplitComplementary = () => {
-	const h0 = randomHue();
+export const generateSplitComplementary = baseColor => {
+	const c0 = baseColor
+		? new Color(baseColor)
+		: new Color({
+				h: randomHue(),
+				s: randomNumber(50, 90),
+				l: randomNumber(50, 70)
+		  });
 
 	const deviance = 60;
-	const h1 = clampHue(h0 + 180 - deviance);
-	const h2 = clampHue(h0 + 180 + deviance);
+	const h1 = clampHue(c0.hsl.h + 180 - deviance);
+	const h2 = clampHue(c0.hsl.h + 180 + deviance);
 
 	const s = randomNumber(20, 50);
 	const l = randomNumber(40, 90);
 
 	return [
-		new Color({
-			h: h0,
-			s: randomNumber(50, 90),
-			l: randomNumber(50, 70)
-		}),
+		c0,
 		new Color({
 			h: h1,
 			s,
@@ -81,19 +104,20 @@ export const generateSplitComplementary = () => {
 	];
 };
 
-export const generateTetradic = () => {
-	const h0 = randomHue();
-	const h1 = clampHue(h0 + 180);
-
-	const h2 = randomNumber(-1, 1) > 0 ? clampHue(h0 + randomNumber(30, 90)) : clampHue(h0 + randomNumber(-30, -90));
+export const generateTetradic = baseColor => {
+	const c0 = baseColor
+		? new Color(baseColor)
+		: new Color({
+				h: randomHue(),
+				s: randomNumber(50, 90),
+				l: randomNumber(40, 90)
+		  });
+	const h1 = clampHue(c0.hsl.h + 180);
+	const h2 = randomNumber(-1, 1) > 0 ? clampHue(c0.hsl.h + randomNumber(30, 90)) : clampHue(c0.hsl.h + randomNumber(-30, -90));
 	const h3 = clampHue(h2 + 180);
 
 	return [
-		new Color({
-			h: h0,
-			s: randomNumber(50, 90),
-			l: randomNumber(40, 90)
-		}),
+		c0,
 		new Color({
 			h: h1,
 			s: randomNumber(10, 20),
