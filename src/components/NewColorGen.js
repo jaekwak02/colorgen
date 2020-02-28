@@ -59,7 +59,7 @@ const NewColorGen = () => {
       <ElExportContainer>
         {colors.map((color, colorIndex) => (
           <div key={colorIndex}>
-            --var-color-accent-{colorIndex * 100 + 100}: {color};
+            --color-accent-{colorIndex * 100 + 100}: {color};
           </div>
         ))}
       </ElExportContainer>
