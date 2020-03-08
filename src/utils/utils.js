@@ -9,7 +9,7 @@ const numbersToHex = (r, g, b) =>
     2
   )}`;
 
-const clamp = (value, min = 0, max = 1) =>
+export const clamp = (value, min = 0, max = 1) =>
   Math.round(Math.min(Math.max(value, min), max));
 
 export const clamp0to255 = value =>

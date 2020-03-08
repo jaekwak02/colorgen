@@ -1,68 +1,70 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import {
-  hexToRGB,
-  clamp0to255,
-  RGBToHex,
-  lerp,
-  getTextDark,
-  hexToHSL,
-  HSLToHex
-} from "../utils/utils";
+import color from "color";
+import ColorGeneratorRow from "./ColorGeneratorRow";
+import ColorPicker from "./ColorPicker";
 
 const NewColorGen = () => {
-  // ef44ff	d73de6	bf36cc	a730b3	8f2999	782280	601b66	48144c	300e33	180719	000000
-  // ef44ff	f157ff	f269ff	f47cff	f58fff	f7a2ff	f9b4ff	fac7ff	fcdaff	fdecff	ffffff
+  const [editingIndex, setEditingIndex] = useState(-1);
+  const [baseColors, setBaseColors] = useState([
+    "#12db7d",
+    "#FF4499",
+    "#333377",
+    "#22DDFF"
+  ]);
+  const generatedColors = baseColors.map(c => generateColors(c));
 
-  const baseColor = "#ef44ff";
-  // const colors = [];
-  // [...new Array(9)].reverse().forEach((_, i) => {
-  //   const rgb = hexToRGB(baseColor);
-  //   rgb.r = clamp0to255(lerp(rgb.r, 0, (i + 1) / 10));
-  //   rgb.g = clamp0to255(lerp(rgb.g, 0, (i + 1) / 10));
-  //   rgb.b = clamp0to255(lerp(rgb.b, 0, (i + 1) / 10));
-  //   colors.unshift(RGBToHex(rgb));
-  // });
-
-  // colors.push(baseColor);
-
-  // [...new Array(9)].forEach((_, i) => {
-  //   const rgb = hexToRGB(baseColor);
-  //   rgb.r = clamp0to255(lerp(rgb.r, 255, (i + 1) / 10));
-  //   rgb.g = clamp0to255(lerp(rgb.g, 255, (i + 1) / 10));
-  //   rgb.b = clamp0to255(lerp(rgb.b, 255, (i + 1) / 10));
-  //   colors.push(RGBToHex(rgb));
-  // });
-
-  const baseHSL = hexToHSL(baseColor);
-  console.log({ baseHSL });
-
-  const colors = [20, 30, 40, 48, 60, 70, 80, 88, 95].map(light =>
-    HSLToHex({ ...baseHSL, l: light })
-  );
+  console.log("NEW COLOR GEN", baseColors);
 
   return (
     <ElContainer>
-      <ElColorOptions>
-        {colors.map((color, colorIndex) => (
-          <ElColor
-            key={colorIndex}
-            style={{
-              backgroundColor: color,
-              color: getTextDark(color) ? "black" : "white"
-            }}
-          >
-            {color}
-          </ElColor>
-        ))}
-      </ElColorOptions>
-      <ElExportContainer>
-        {colors.map((color, colorIndex) => (
-          <div key={colorIndex}>
-            --color-accent-{colorIndex * 100 + 100}: {color};
-          </div>
-        ))}
-      </ElExportContainer>
+      <ElColorsContainer>
+        <ElColors>
+          {generatedColors.map(({ colors, level }, colorIndex) => (
+            <ColorGeneratorRow
+              key={colorIndex}
+              colors={colors}
+              level={level}
+              setColor={c => {
+                const newBaseColors = [...baseColors];
+                newBaseColors[colorIndex] = c;
+                setBaseColors(newBaseColors);
+              }}
+              index={colorIndex}
+              editingIndex={editingIndex}
+              setEditingIndex={setEditingIndex}
+            />
+          ))}
+        </ElColors>
+        <ElColorPickerContainer>
+          {editingIndex !== -1 && (
+            <ColorPicker
+              key={editingIndex}
+              color={baseColors[editingIndex]}
+              setColor={c => {
+                const newBaseColors = [...baseColors];
+                newBaseColors[editingIndex] = c;
+                setBaseColors(newBaseColors);
+              }}
+            />
+          )}
+        </ElColorPickerContainer>
+      </ElColorsContainer>
+      <div>
+        <div className="medium-header">Export</div>
+        <ElExportContainer>
+          {generatedColors
+            .map(({ colors }, index) =>
+              colors
+                .map(
+                  (c, colorIndex) =>
+                    `--color-${index + 1}-${colorIndex * 100 + 100}: ${c};`
+                )
+                .join("\n")
+            )
+            .join("\n\n")}
+        </ElExportContainer>
+      </div>
     </ElContainer>
   );
 };
@@ -74,24 +76,149 @@ const ElContainer = styled.div`
   grid-gap: 30px;
 `;
 
-const ElColorOptions = styled.div`
+const ElColorsContainer = styled.div`
   display: grid;
+  grid-template-columns: 1fr auto;
+  min-height: 400px;
 `;
 
-const ElColor = styled.div`
-  height: 50px;
-
+const ElColors = styled.div`
   display: grid;
-  align-items: center;
-  justify-items: center;
+  grid-gap: 30px;
+  align-content: start;
 `;
+
+const ElColorPickerContainer = styled.div``;
 
 const ElExportContainer = styled.div`
   background-color: #484848;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Roboto Mono";
   padding: 30px;
+  line-height: 25px;
+  white-space: pre;
 
   color: white;
 `;
+
+// const generateColors = baseColor => {
+//   const colors = [baseColor];
+
+//   while (colors.length < 9) {
+//     const lastColor = colors[colors.length - 1];
+//     const luminosity = color(lastColor).luminosity();
+//     const proximityTo50 = (50 - Math.abs(50 - luminosity * 100)) / 50;
+//     const scalingFactor = Math.pow(proximityTo50, 2);
+//     console.log({ luminosity, scalingFactor });
+//     const increment = 0.15;
+//     const nextColor = color(lastColor).lighten(scalingFactor * increment);
+
+//     colors.push(nextColor.hex());
+//   }
+
+//   return colors;
+// };
+
+// const generateColors = baseColor => {
+//   const c = color(baseColor);
+//   console.log("luminosity", c.luminosity());
+//   console.log("lightness", c.lightness());
+//   console.log("hex", c.hex());
+
+//   const standardRange = [5, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 93, 96];
+
+//   const luminosity = c.lightness();
+//   const ROOT = 1.25;
+//   const luminositySqrt = Math.pow(luminosity, 1 / ROOT);
+//   const luminositySqrtStr = luminositySqrt.toString();
+//   const level = Number(luminositySqrtStr[2]);
+//   const values = standardRange.map(x => x / 100);
+
+//   const colorRange = [c.hex()];
+//   let darker = color(c);
+//   let darkerLimit = 0;
+//   while (darker.luminosity() > 0.0 && darkerLimit < 100) {
+//     darkerLimit++;
+//     darker = darker.darken(0.04);
+//     colorRange.unshift(darker.hex());
+//   }
+//   let lighter = color(c);
+//   let lighterLimit = 0;
+//   while (lighter.luminosity() < 0.99 && lighterLimit < 100) {
+//     lighterLimit++;
+//     lighter = lighter.lighten(0.04);
+//     colorRange.push(lighter.hex());
+//   }
+
+//   console.log(
+//     "lightness",
+//     colorRange.map(c => color(c).luminosity())
+//   );
+
+//   const closest = standardRange.reduce((prev, curr) =>
+//     Math.abs(curr - luminosity * 100) < Math.abs(prev - luminosity * 100)
+//       ? curr
+//       : prev
+//   );
+//   const closestIndex = standardRange.indexOf(closest);
+//   const offset = luminosity * 100 - closest;
+//   const farthestDistance = Math.min(closestIndex, 9 - closestIndex);
+
+//   const range = values.map(x => Math.pow(x, ROOT));
+//   console.log(range);
+//   const colors = range.map((lightness, index) => {
+//     return colorRange.reduce((prev, curr) =>
+//       Math.abs(color(curr).lightness() - lightness) <
+//       Math.abs(color(prev).lightness() - lightness)
+//         ? curr
+//         : prev
+//     );
+//   });
+
+//   // return colors;
+
+//   return colorRange;
+// };
+
+const generateColors = baseColor => {
+  const c = color(baseColor);
+
+  const luminosity = c.luminosity();
+  const ROOT = 1.5;
+  const luminositySqrt = Math.pow(luminosity, 1 / ROOT);
+  const luminositySqrtStr = luminositySqrt.toString();
+  const level = Number(luminositySqrtStr[2]);
+
+  const values = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(x =>
+    Number(`0.${x}${luminositySqrtStr.slice(3)}`)
+  );
+
+  const colorRange = [c.hex()];
+  let darker = color(c);
+  let darkerLimit = 0;
+  while (darker.luminosity() > 0.01 && darkerLimit < 100) {
+    darkerLimit++;
+    darker = darker.darken(0.02);
+    colorRange.unshift(darker.hex());
+  }
+  let lighter = color(c);
+  let lighterLimit = 0;
+  while (lighter.luminosity() < 0.99 && lighterLimit < 100) {
+    lighterLimit++;
+    lighter = lighter.lighten(0.02);
+    colorRange.push(lighter.hex());
+  }
+
+  const range = values.map(x => Math.pow(x, ROOT));
+  const colors = range.map((luminosity, index) => {
+    return colorRange.reduce((prev, curr) =>
+      Math.abs(color(curr).luminosity() - luminosity) <
+      Math.abs(color(prev).luminosity() - luminosity)
+        ? curr
+        : prev
+    );
+  });
+
+  return { colors, level };
+};
 
 export default NewColorGen;
