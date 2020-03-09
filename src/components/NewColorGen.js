@@ -40,10 +40,9 @@ const NewColorGen = () => {
     )
     .map(colors => colors.map(c => generateColors(c.hex())));
 
-  console.log("NEW COLOR GEN", baseColors);
-
   return (
     <ElContainer>
+      <h1>Color Theme Generator</h1>
       <ElColorsContainer>
         <ElColors>
           {baseColors.map((baseColor, colorIndex) => {
@@ -96,7 +95,6 @@ const NewColorGen = () => {
           {baseColors
             .reduce((acc, curr, index) => {
               acc.push(generatedColors[index]);
-              console.log(generatedColorSchemes, generatedColorSchemes[index]);
               acc.push(...generatedColorSchemes[index]);
 
               return acc;
