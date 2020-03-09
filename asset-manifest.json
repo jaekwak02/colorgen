@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/colorgen/static/css/main.49daa65a.chunk.css",
+    "main.js": "/colorgen/static/js/main.1724a69a.chunk.js",
+    "main.js.map": "/colorgen/static/js/main.1724a69a.chunk.js.map",
+    "runtime~main.js": "/colorgen/static/js/runtime~main.d386e45a.js",
+    "runtime~main.js.map": "/colorgen/static/js/runtime~main.d386e45a.js.map",
+    "static/css/2.764ccc25.chunk.css": "/colorgen/static/css/2.764ccc25.chunk.css",
+    "static/js/2.0c2e6d7c.chunk.js": "/colorgen/static/js/2.0c2e6d7c.chunk.js",
+    "static/js/2.0c2e6d7c.chunk.js.map": "/colorgen/static/js/2.0c2e6d7c.chunk.js.map",
+    "index.html": "/colorgen/index.html",
+    "precache-manifest.467efb87214ab47f198a6f28f9b505b4.js": "/colorgen/precache-manifest.467efb87214ab47f198a6f28f9b505b4.js",
+    "service-worker.js": "/colorgen/service-worker.js",
+    "static/css/2.764ccc25.chunk.css.map": "/colorgen/static/css/2.764ccc25.chunk.css.map",
+    "static/css/main.49daa65a.chunk.css.map": "/colorgen/static/css/main.49daa65a.chunk.css.map"
+  }
+}
