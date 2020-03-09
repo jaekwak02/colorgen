@@ -7,12 +7,38 @@ import ColorPicker from "./ColorPicker";
 const NewColorGen = () => {
   const [editingIndex, setEditingIndex] = useState(-1);
   const [baseColors, setBaseColors] = useState([
-    "#12db7d",
-    "#FF4499",
-    "#333377",
-    "#22DDFF"
+    { color: "#12db7d", scheme: null },
+    { color: "#FF4499", scheme: "analogous" }
   ]);
-  const generatedColors = baseColors.map(c => generateColors(c));
+  const generatedColors = baseColors.map(c => generateColors(c.color));
+  const generatedColorSchemes = baseColors
+    .map(baseColor =>
+      baseColor.scheme === "analogous"
+        ? [
+            color(baseColor.color).rotate(-30),
+            color(baseColor.color).rotate(30)
+          ]
+        : baseColor.scheme === "complementary"
+        ? [color(baseColor.color).rotate(180)]
+        : baseColor.scheme === "split-complementary"
+        ? [
+            color(baseColor.color).rotate(150),
+            color(baseColor.color).rotate(210)
+          ]
+        : baseColor.scheme === "triadic"
+        ? [
+            color(baseColor.color).rotate(-120),
+            color(baseColor.color).rotate(120)
+          ]
+        : baseColor.scheme === "tetradic"
+        ? [
+            color(baseColor.color).rotate(-180),
+            color(baseColor.color).rotate(-90),
+            color(baseColor.color).rotate(90)
+          ]
+        : []
+    )
+    .map(colors => colors.map(c => generateColors(c.hex())));
 
   console.log("NEW COLOR GEN", baseColors);
 
@@ -20,31 +46,45 @@ const NewColorGen = () => {
     <ElContainer>
       <ElColorsContainer>
         <ElColors>
-          {generatedColors.map(({ colors, level }, colorIndex) => (
-            <ColorGeneratorRow
-              key={colorIndex}
-              colors={colors}
-              level={level}
-              setColor={c => {
-                const newBaseColors = [...baseColors];
-                newBaseColors[colorIndex] = c;
-                setBaseColors(newBaseColors);
-              }}
-              index={colorIndex}
-              editingIndex={editingIndex}
-              setEditingIndex={setEditingIndex}
-            />
-          ))}
+          {baseColors.map((baseColor, colorIndex) => {
+            const { colors, level } = generatedColors[colorIndex];
+            const additionalRows = generatedColorSchemes[colorIndex];
+
+            return (
+              <ElColorRowGroup key={colorIndex}>
+                <ColorGeneratorRow
+                  colors={colors}
+                  level={level}
+                  index={colorIndex}
+                  editingIndex={editingIndex}
+                  setEditingIndex={setEditingIndex}
+                />
+                {additionalRows.map(({ colors, level }, rowIndex) => (
+                  <ColorGeneratorRow
+                    key={rowIndex}
+                    colors={colors}
+                    level={level}
+                    showConnector
+                  />
+                ))}
+              </ElColorRowGroup>
+            );
+          })}
         </ElColors>
         <ElColorPickerContainer>
           {editingIndex !== -1 && (
             <ColorPicker
               key={editingIndex}
-              color={baseColors[editingIndex]}
-              setColor={c => {
+              color={baseColors[editingIndex].color}
+              setColor={hex => {
                 const newBaseColors = [...baseColors];
-                newBaseColors[editingIndex] = c;
+                newBaseColors[editingIndex].color = hex;
                 setBaseColors(newBaseColors);
+              }}
+              scheme={baseColors[editingIndex].scheme}
+              setScheme={scheme => {
+                baseColors[editingIndex].scheme = scheme;
+                setBaseColors([...baseColors]);
               }}
             />
           )}
@@ -53,7 +93,14 @@ const NewColorGen = () => {
       <div>
         <div className="medium-header">Export</div>
         <ElExportContainer>
-          {generatedColors
+          {baseColors
+            .reduce((acc, curr, index) => {
+              acc.push(generatedColors[index]);
+              console.log(generatedColorSchemes, generatedColorSchemes[index]);
+              acc.push(...generatedColorSchemes[index]);
+
+              return acc;
+            }, [])
             .map(({ colors }, index) =>
               colors
                 .map(
@@ -86,6 +133,12 @@ const ElColors = styled.div`
   display: grid;
   grid-gap: 30px;
   align-content: start;
+`;
+
+const ElColorRowGroup = styled.div`
+  display: grid;
+  grid-gap: 30px;
+  align-items: center;
 `;
 
 const ElColorPickerContainer = styled.div``;

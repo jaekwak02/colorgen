@@ -5,14 +5,14 @@ import color from "color";
 const ColorGeneratorRow = ({
   colors,
   level,
-  setColor,
   index,
   editingIndex,
-  setEditingIndex
+  setEditingIndex,
+  showConnector = false
 }) => {
   return (
     <ElContainer>
-      <ElColorOptions>
+      <ElColors>
         {colors.map((c, colorIndex) => (
           <ElColor
             key={colorIndex}
@@ -24,12 +24,15 @@ const ColorGeneratorRow = ({
             {colorIndex === level - 1 && "╳"}
           </ElColor>
         ))}
-      </ElColorOptions>
-      <ElColorOptions
-        onClick={() => setEditingIndex(index === editingIndex ? -1 : index)}
-      >
-        <ElColor style={{ backgroundColor: colors[level - 1] }}></ElColor>
-      </ElColorOptions>
+        {showConnector && <ElConnector />}
+      </ElColors>
+      {typeof index === "number" && (
+        <ElColorSelect
+          onClick={() => setEditingIndex(index === editingIndex ? -1 : index)}
+        >
+          <ElColor style={{ backgroundColor: colors[level - 1] }} />
+        </ElColorSelect>
+      )}
     </ElContainer>
   );
 };
@@ -37,10 +40,12 @@ const ColorGeneratorRow = ({
 const ElContainer = styled.div`
   display: grid;
   grid-gap: 30px;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto auto auto 1fr;
+  align-items: flex-start;
 `;
 
-const ElColorOptions = styled.div`
+const ElColors = styled.div`
+  position: relative;
   display: grid;
   grid-auto-flow: column;
   justify-content: start;
@@ -57,8 +62,25 @@ const ElColor = styled.div`
   justify-items: center;
 `;
 
-const ElColorPickerContainer = styled.div`
-  height: 0;
+const ElColorSelect = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: start;
+  justify-self: start;
+  border: 1px solid var(--color-neutral-500);
+`;
+
+const ElConnector = styled.div`
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: -31px;
+  transform: translateX(-50%);
+  height: 30px;
+  /* width: calc(100% - 75px); */
+  width: 15px;
+  background-color: var(--color-neutral-600);
 `;
 
 export default ColorGeneratorRow;
