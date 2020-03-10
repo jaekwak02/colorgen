@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/colorgen/static/css/main.49daa65a.chunk.css",
-    "main.js": "/colorgen/static/js/main.4b045f2e.chunk.js",
-    "main.js.map": "/colorgen/static/js/main.4b045f2e.chunk.js.map",
+    "main.js": "/colorgen/static/js/main.ccfb3a3c.chunk.js",
+    "main.js.map": "/colorgen/static/js/main.ccfb3a3c.chunk.js.map",
     "runtime~main.js": "/colorgen/static/js/runtime~main.d386e45a.js",
     "runtime~main.js.map": "/colorgen/static/js/runtime~main.d386e45a.js.map",
     "static/css/2.764ccc25.chunk.css": "/colorgen/static/css/2.764ccc25.chunk.css",
     "static/js/2.f84edc48.chunk.js": "/colorgen/static/js/2.f84edc48.chunk.js",
     "static/js/2.f84edc48.chunk.js.map": "/colorgen/static/js/2.f84edc48.chunk.js.map",
     "index.html": "/colorgen/index.html",
-    "precache-manifest.e2f608acfb365fb06ae29524ace63023.js": "/colorgen/precache-manifest.e2f608acfb365fb06ae29524ace63023.js",
+    "precache-manifest.04cc909020bd0a53d6176c6ec27fdee2.js": "/colorgen/precache-manifest.04cc909020bd0a53d6176c6ec27fdee2.js",
     "service-worker.js": "/colorgen/service-worker.js",
     "static/css/2.764ccc25.chunk.css.map": "/colorgen/static/css/2.764ccc25.chunk.css.map",
     "static/css/main.49daa65a.chunk.css.map": "/colorgen/static/css/main.49daa65a.chunk.css.map"
