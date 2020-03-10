@@ -7,36 +7,36 @@ import ColorPicker from "./ColorPicker";
 const NewColorGen = () => {
   const [editingIndex, setEditingIndex] = useState(-1);
   const [baseColors, setBaseColors] = useState([
-    { color: "#12db7d", scheme: null },
-    { color: "#FF4499", scheme: "analogous" }
+    { color: "#9C999A", scheme: null },
+    { color: "#FF2EBD", scheme: "analogous" }
   ]);
   const generatedColors = baseColors.map(c => generateColors(c.color));
   const generatedColorSchemes = baseColors
     .map(baseColor =>
       baseColor.scheme === "analogous"
         ? [
-            color(baseColor.color).rotate(-30),
-            color(baseColor.color).rotate(30)
-          ]
+          color(baseColor.color).rotate(-30),
+          color(baseColor.color).rotate(30)
+        ]
         : baseColor.scheme === "complementary"
-        ? [color(baseColor.color).rotate(180)]
-        : baseColor.scheme === "split-complementary"
-        ? [
-            color(baseColor.color).rotate(150),
-            color(baseColor.color).rotate(210)
-          ]
-        : baseColor.scheme === "triadic"
-        ? [
-            color(baseColor.color).rotate(-120),
-            color(baseColor.color).rotate(120)
-          ]
-        : baseColor.scheme === "tetradic"
-        ? [
-            color(baseColor.color).rotate(-180),
-            color(baseColor.color).rotate(-90),
-            color(baseColor.color).rotate(90)
-          ]
-        : []
+          ? [color(baseColor.color).rotate(180)]
+          : baseColor.scheme === "split-complementary"
+            ? [
+              color(baseColor.color).rotate(150),
+              color(baseColor.color).rotate(210)
+            ]
+            : baseColor.scheme === "triadic"
+              ? [
+                color(baseColor.color).rotate(-120),
+                color(baseColor.color).rotate(120)
+              ]
+              : baseColor.scheme === "tetradic"
+                ? [
+                  color(baseColor.color).rotate(-180),
+                  color(baseColor.color).rotate(-90),
+                  color(baseColor.color).rotate(90)
+                ]
+                : []
     )
     .map(colors => colors.map(c => generateColors(c.hex())));
 
@@ -123,7 +123,8 @@ const ElContainer = styled.div`
 
 const ElColorsContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) 490px;
+  grid-gap: 30px;
   min-height: 400px;
 `;
 
@@ -263,7 +264,7 @@ const generateColors = baseColor => {
   const colors = range.map((luminosity, index) => {
     return colorRange.reduce((prev, curr) =>
       Math.abs(color(curr).luminosity() - luminosity) <
-      Math.abs(color(prev).luminosity() - luminosity)
+        Math.abs(color(prev).luminosity() - luminosity)
         ? curr
         : prev
     );
