@@ -5,10 +5,10 @@ import ColorGeneratorRow from "./ColorGeneratorRow";
 import ColorPicker from "./ColorPicker";
 
 const NewColorGen = () => {
-  const [editingIndex, setEditingIndex] = useState(-1);
+  const [editingIndex, setEditingIndex] = useState(0);
   const [baseColors, setBaseColors] = useState([
+    { color: "#FF2EBD", scheme: "analogous" },
     { color: "#9C999A", scheme: null },
-    { color: "#FF2EBD", scheme: "analogous" }
   ]);
   const generatedColors = baseColors.map(c => generateColors(c.color));
   const generatedColorSchemes = baseColors
@@ -116,6 +116,8 @@ const NewColorGen = () => {
 
 const ElContainer = styled.div`
   padding: 30px;
+  max-width: 1600px;
+  margin: auto;
 
   display: grid;
   grid-gap: 30px;
