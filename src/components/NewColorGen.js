@@ -3,6 +3,7 @@ import styled from "styled-components";
 import color from "color";
 import ColorGeneratorRow from "./ColorGeneratorRow";
 import ColorPicker from "./ColorPicker";
+import TextButton from "./TextButton"
 
 const NewColorGen = () => {
   const [editingIndex, setEditingIndex] = useState(0);
@@ -69,6 +70,13 @@ const NewColorGen = () => {
               </ElColorRowGroup>
             );
           })}
+          <div>
+            <TextButton onClick={() =>
+              setBaseColors([...baseColors, { color: "#ffffff", scheme: null }])
+            }>
+              Add Color
+          </TextButton>
+          </div>
         </ElColors>
         <ElColorPickerContainer>
           {editingIndex !== -1 && (

@@ -8,6 +8,16 @@
   --color-warning: #f0c808;
   --color-error: #b80c09;
 
+  --color-primary-100: #004C62;
+  --color-primary-200: #016E8D;
+  --color-primary-300: #0189B1;
+  --color-primary-400: #01A1CF;
+  --color-primary-500: #01BAEF;
+  --color-primary-600: #32D1FE;
+  --color-primary-700: #7CE1FE;
+  --color-primary-800: #B4EEFF;
+  --color-primary-900: #EBFAFF;
+
   --color-neutral-100: #333333;
   --color-neutral-200: #4d4d4d;
   --color-neutral-300: #666666;
