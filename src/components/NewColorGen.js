@@ -241,6 +241,31 @@ const ElExportContainer = styled.div`
 //   return colorRange;
 // };
 
+// const generateColors = baseColor => {
+//   const c = color(baseColor);
+
+
+
+
+//   const level = Math.round(c.luminosity() * 10);
+//   const length = 9;
+//   const colors = [c.hex()];
+//   for (let i = 1; i <= level; i++) {
+//     const darkenedColor = c.mix(color('#000'), i / (level + 1)); 
+//     console.log({ level, i, value: i / (level - 1), darkenedColor });
+//     colors.unshift(darkenedColor.hex());
+//   }
+//   for (let i = 1; i <= length - level; i++) {
+//     const lightenedColor = c.mix(color('#fff'), i / (length - level));
+//     console.log({ level, i, value: i / (length - level), lightenedColor });
+//     colors.push(lightenedColor.hex())
+//   }
+
+//   console.log({ luminosity: Math.round(c.luminosity() * 10), level, colors });
+
+//   return { colors, level };
+// }
+
 const generateColors = baseColor => {
   const c = color(baseColor);
 
@@ -248,11 +273,14 @@ const generateColors = baseColor => {
   const ROOT = 1.5;
   const luminositySqrt = Math.pow(luminosity, 1 / ROOT);
   const luminositySqrtStr = luminositySqrt.toString();
-  const level = Number(luminositySqrtStr[2]);
 
-  const values = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(x =>
+  const standardRange = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9.5];
+  const closest = standardRange.reduce((prev, curr) => Math.abs(prev - luminositySqrt * 10) > Math.abs(curr - luminositySqrt * 10) ? curr : prev);
+  const level = standardRange.indexOf(closest) + 1;
+  const values = standardRange.map(x =>
     Number(`0.${x}${luminositySqrtStr.slice(3)}`)
   );
+  console.log({ baseColor, luminosity, closest, level })
 
   const colorRange = [c.hex()];
   let darker = color(c);

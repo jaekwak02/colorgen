@@ -1,13 +1,13 @@
 import React from "react";
+
 import "normalize.css";
 import "./transitions.css";
-
-import NewColorGen from "../NewColorGen";
-
 import "./App.css";
 
+import HomePage from "../pages/HomePage";
+
 function App() {
-  return <NewColorGen />;
+  return <HomePage />
 }
 
 export default App;

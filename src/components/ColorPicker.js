@@ -1,111 +1,146 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useReducer, useEffect } from "react";
 import styled, { css } from "styled-components";
 import color from "color";
 import MarkerContainer from "./MarkerContainer";
-import TextInput from "./TextInput"
+import TextInput from "./TextInput";
 import { lerp } from "../utils/utils";
 
 const ColorPicker = ({
   color: defaultColor = "#ff0000",
   setColor,
   scheme,
-  setScheme
+  setScheme,
 }) => {
   const size = 400;
   const sizeHue = 60;
 
-  const {
-    defaultHuePosition,
-    defaultHue,
-    defaultMarkerPosition
-  } = useMemo(() => getParameters(defaultColor, size), []);
+  const [state, dispatch] = useReducer(
+    (state, action) => {
+      const [type, data] = action;
 
-  const [s, setS] = useState({
-    colorInput: defaultColor,
-    pickerColor: defaultHue,
-    markerPosition: defaultMarkerPosition,
-    huePosition: [0, defaultHuePosition],
-  });
+      switch (type) {
+        case "COLOR_INPUT": {
+          state.colorInput = data;
+
+          if (/^#[0-9a-f]{6}$/i.test(state.colorInput)) {
+            const {
+              defaultHuePosition,
+              defaultHue,
+              defaultMarkerPosition,
+            } = getParameters(state.colorInput, size);
+
+            state.pickerColor = defaultHue;
+            state.huePosition = defaultHuePosition;
+            state.markerPosition = defaultMarkerPosition;
+            state.selectedColor = getSelectedColor(state, size);
+          }
+
+          return { ...state };
+        }
+        case "SET_MARKER_POSITION": {
+          state.markerPosition = data;
+          state.selectedColor = getSelectedColor(state, size);
+          state.colorInput = state.selectedColor;
+
+          return { ...state };
+        }
+        case "SET_HUE_POSITION": {
+          const hue = color("#ff0000")
+            .rotate((data[1] / size) * 360)
+            .hex();
+
+          state.huePosition = data;
+          state.pickerColor = hue;
+          state.selectedColor = getSelectedColor(state, size);
+          state.colorInput = state.selectedColor;
+
+          return { ...state };
+        }
+        default: {
+          throw new Error(`${type} is not a supported action.`);
+        }
+      }
+    },
+    null,
+    () => {
+      const {
+        defaultHuePosition,
+        defaultHue,
+        defaultMarkerPosition,
+      } = getParameters(defaultColor, size);
+
+      return {
+        selectedColor: defaultColor,
+        colorInput: defaultColor,
+        pickerColor: defaultHue,
+        markerPosition: defaultMarkerPosition,
+        huePosition: [0, defaultHuePosition],
+      };
+    }
+  );
 
   const {
+    selectedColor,
     colorInput,
     pickerColor,
     markerPosition,
     huePosition,
-  } = s
+  } = state;
 
-  const x = markerPosition[0] / size;
-  const y = markerPosition[1] / size;
-
-  const rgb = color(pickerColor)
-    .rgb()
-    .array();
-  const r = lerp(lerp(255, rgb[0], x), 0, y);
-  const g = lerp(lerp(255, rgb[1], x), 0, y);
-  const b = lerp(lerp(255, rgb[2], x), 0, y);
-  const selectedColor = color([r, g, b]).hex();
-
+  // Propagate any changes to the parent
   useEffect(() => {
     if (defaultColor !== selectedColor) {
-      const timeout = setTimeout(() => {
-        setColor(selectedColor);
-
-        if (selectedColor.toLowerCase() !== colorInput.toLowerCase()) {
-          setS(s => ({ ...s, colorInput: selectedColor }));
-        }
-      }, 100);
-
-      return () => clearTimeout(timeout);
+      setColor(selectedColor);
     }
-  }, [defaultColor, selectedColor, setColor, colorInput]);
+  }, [selectedColor]); // eslint-disable-line
+
+  // // Reset on value change
+  // useEffect(() => {
+  //   if (defaultColor !== selectedColor) {
+  //     dispatch(["COLOR_INPUT", defaultColor.toUpperCase()]);
+  //   }
+  // }, [defaultColor]); // eslint-disable-line
 
   return (
     <ElColorPickerContainer>
       <ElColorPickerTopRow>
         <MarkerContainer
           position={markerPosition}
-          setPosition={p => setS({ ...s, markerPosition: p })}
+          setPosition={(p) => dispatch(["SET_MARKER_POSITION", p])}
           width={size}
           height={size}
           style={{
-            backgroundColor: color(pickerColor)
+            backgroundColor: color(pickerColor),
           }}
         >
           <ElColorPickerBackground
             style={{
-              background: `linear-gradient(to left, transparent, white)`
+              background: `linear-gradient(to left, transparent, white)`,
             }}
           />
           <ElColorPickerBackground
             style={{
-              background: "linear-gradient(to top, black, transparent)"
+              background: "linear-gradient(to top, black, transparent)",
             }}
           />
           <ElColorPickerMarker
             style={{
               left: `${markerPosition[0] / 4}%`,
               top: `${markerPosition[1] / 4}%`,
-              backgroundColor: selectedColor
+              backgroundColor: selectedColor,
             }}
           />
         </MarkerContainer>
         <MarkerContainer
           position={huePosition}
-          setPosition={p => {
-            const hue = color("#ff0000")
-              .rotate((p[1] / size) * 360)
-              .hex();
-            setS({
-              ...s,
-              huePosition: p,
-              pickerColor: hue
-            });
+          setPosition={(p) => {
+            dispatch(["SET_HUE_POSITION", p]);
           }}
           width={sizeHue}
           height={size}
           style={{
             background:
-              "linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)"
+              "linear-gradient(to bottom, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)",
           }}
         >
           <ElColorPickerHueMarker style={{ top: `${huePosition[1] / 4}%` }} />
@@ -113,37 +148,13 @@ const ColorPicker = ({
       </ElColorPickerTopRow>
       <ElColorPickerBottomRow>
         <div>
-          <TextInput value={colorInput} onChange={(e) => {
-            const newColorInput = e.target.value;
-
-            if (/^#[0-9a-f]{6}$/i.test(newColorInput)) {
-              const {
-                defaultHuePosition,
-                defaultHue,
-                defaultMarkerPosition
-              } = getParameters(newColorInput, size);
-
-              console.log({
-                defaultHuePosition,
-                defaultHue,
-                defaultMarkerPosition
-              });
-
-              setS({
-                colorInput: newColorInput,
-                pickerColor: defaultHue,
-                huePosition: defaultHuePosition,
-                markerPosition: defaultMarkerPosition,
-              })
-            } else {
-              setS({ ...s, colorInput: newColorInput })
-            }
-          }} />
+          <TextInput
+            value={colorInput}
+            onChange={(e) => dispatch(["COLOR_INPUT", e.target.value])}
+          />
         </div>
-        <div>
-          <div className="small-header">
-            Color Scheme
-          </div>
+        {/* <div>
+          <div className="small-header">Color Scheme</div>
           <ElColorSchemeOptions>
             {[
               { label: "None", value: null },
@@ -151,7 +162,7 @@ const ColorPicker = ({
               { label: "Complementary", value: "complementary" },
               { label: "Split Complementary", value: "split-complementary" },
               { label: "Triadic", value: "triadic" },
-              { label: "Tetradic", value: "tetradic" }
+              { label: "Tetradic", value: "tetradic" },
             ].map((o, index) => (
               <ElColorSchemeOption
                 key={index}
@@ -162,10 +173,23 @@ const ColorPicker = ({
               </ElColorSchemeOption>
             ))}
           </ElColorSchemeOptions>
-        </div>
+        </div> */}
       </ElColorPickerBottomRow>
     </ElColorPickerContainer>
   );
+};
+
+const getSelectedColor = (state, size) => {
+  const x = state.markerPosition[0] / size;
+  const y = state.markerPosition[1] / size;
+
+  const rgb = color(state.pickerColor).rgb().array();
+  const r = lerp(lerp(255, rgb[0], x), 0, y);
+  const g = lerp(lerp(255, rgb[1], x), 0, y);
+  const b = lerp(lerp(255, rgb[2], x), 0, y);
+  const selectedColor = color([r, g, b]).hex();
+
+  return selectedColor;
 };
 
 const getParameters = (baseColor, size) => {
@@ -174,31 +198,27 @@ const getParameters = (baseColor, size) => {
     .rotate((defaultHuePosition / size) * 360)
     .hex();
 
-  const hueRGB = color(defaultHue)
-    .rgb()
-    .array();
-  const base = color(baseColor)
-    .rgb()
-    .array();
+  const hueRGB = color(defaultHue).rgb().array();
+  const base = color(baseColor).rgb().array();
   const max = Math.max(...base);
   const y = size - (max / 255) * size;
-  const baseSaturated = base.map(x => (x * 255) / max);
+  const baseSaturated = base.map((x) => (x * 255) / max);
 
   const toWhite =
     baseSaturated[0] !== 255
       ? (baseSaturated[0] - hueRGB[0]) / (255 - hueRGB[0])
       : baseSaturated[1] !== 255
-        ? (baseSaturated[1] - hueRGB[1]) / (255 - hueRGB[1])
-        : (baseSaturated[2] - hueRGB[2]) / (255 - hueRGB[2]);
+      ? (baseSaturated[1] - hueRGB[1]) / (255 - hueRGB[1])
+      : (baseSaturated[2] - hueRGB[2]) / (255 - hueRGB[2]);
 
   const x = size - toWhite * size;
 
   return {
     defaultHuePosition,
     defaultHue,
-    defaultMarkerPosition: [x, y]
+    defaultMarkerPosition: [x, y],
   };
-}
+};
 
 const ElColorPickerContainer = styled.div`
   display: grid;
@@ -212,13 +232,13 @@ const ElColorPickerTopRow = styled.div`
   grid-auto-flow: column;
   align-items: flex-start;
   justify-items: flex-start;
-`
+`;
 
 const ElColorPickerBottomRow = styled.div`
   display: grid;
   grid-gap: 30px;
   grid-auto-flow: column;
-`
+`;
 
 const ElColorPickerBackground = styled.div`
   position: absolute;
@@ -275,7 +295,7 @@ const ElColorSchemeOption = styled.div`
     color: white;
   }
 
-  ${props =>
+  ${(props) =>
     props.active &&
     css`
       background-color: var(--color-neutral-500);
