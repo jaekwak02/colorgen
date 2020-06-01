@@ -1,9 +1,9 @@
 import React from "react";
-import styled from "styled-components"
+import styled from "styled-components";
 
-const TextInput = ({ ...rest }) => {
-  return <ElInput {...rest} />
-}
+const TextInput = ({ value, ...rest }) => {
+  return <ElInput value={value || ""} {...rest} />;
+};
 
 const ElInput = styled.input`
   border: 1px solid var(--color-neutral-500);
@@ -13,6 +13,10 @@ const ElInput = styled.input`
 
   color: white;
   line-height: 28px;
-`
 
-export default TextInput
+  &::placeholder {
+    color: var(--color-neutral-500);
+  }
+`;
+
+export default TextInput;

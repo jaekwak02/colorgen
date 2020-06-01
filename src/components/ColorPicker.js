@@ -5,12 +5,7 @@ import MarkerContainer from "./MarkerContainer";
 import TextInput from "./TextInput";
 import { lerp } from "../utils/utils";
 
-const ColorPicker = ({
-  color: defaultColor = "#ff0000",
-  setColor,
-  scheme,
-  setScheme,
-}) => {
+const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
   const size = 400;
   const sizeHue = 60;
 
@@ -94,13 +89,6 @@ const ColorPicker = ({
     }
   }, [selectedColor]); // eslint-disable-line
 
-  // // Reset on value change
-  // useEffect(() => {
-  //   if (defaultColor !== selectedColor) {
-  //     dispatch(["COLOR_INPUT", defaultColor.toUpperCase()]);
-  //   }
-  // }, [defaultColor]); // eslint-disable-line
-
   return (
     <ElColorPickerContainer>
       <ElColorPickerTopRow>
@@ -153,27 +141,6 @@ const ColorPicker = ({
             onChange={(e) => dispatch(["COLOR_INPUT", e.target.value])}
           />
         </div>
-        {/* <div>
-          <div className="small-header">Color Scheme</div>
-          <ElColorSchemeOptions>
-            {[
-              { label: "None", value: null },
-              { label: "Analogous", value: "analogous" },
-              { label: "Complementary", value: "complementary" },
-              { label: "Split Complementary", value: "split-complementary" },
-              { label: "Triadic", value: "triadic" },
-              { label: "Tetradic", value: "tetradic" },
-            ].map((o, index) => (
-              <ElColorSchemeOption
-                key={index}
-                active={scheme === o.value}
-                onClick={() => setScheme(o.value)}
-              >
-                {o.label}
-              </ElColorSchemeOption>
-            ))}
-          </ElColorSchemeOptions>
-        </div> */}
       </ElColorPickerBottomRow>
     </ElColorPickerContainer>
   );
@@ -222,7 +189,7 @@ const getParameters = (baseColor, size) => {
 
 const ElColorPickerContainer = styled.div`
   display: grid;
-  grid-gap: 30px;
+  grid-gap: 15px;
   align-items: flex-start;
 `;
 
@@ -268,40 +235,6 @@ const ElColorPickerHueMarker = styled.div`
   height: 2px;
   transform: translateX(-5px) translateY(-1px);
   background-color: white;
-`;
-
-const ElColorSchemeOptions = styled.div`
-  display: grid;
-  grid-gap: 10px;
-`;
-
-const ElColorSchemeOption = styled.div`
-  height: 30px;
-  padding: 0px 15px;
-  background-color: var(--color-neutral-400);
-  border: 1px solid var(--color-neutral-500);
-
-  color: var(--color-neutral-500);
-
-  display: grid;
-  justify-items: center;
-  align-items: center;
-
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--color-neutral-500);
-    background-color: var(--color-neutral-600);
-    color: white;
-  }
-
-  ${(props) =>
-    props.active &&
-    css`
-      background-color: var(--color-neutral-500);
-      background-color: var(--color-neutral-600);
-      color: white;
-    `}
 `;
 
 export default ColorPicker;

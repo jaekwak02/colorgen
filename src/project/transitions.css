@@ -1,22 +1,44 @@
 /* FADE */
 
 .fade-enter {
-	opacity: 0;
-	transform: scale(0.9);
+  opacity: 0;
+  transform: scale(0.9);
 }
 
 .fade-enter-active {
-	opacity: 1;
-	transform: translateX(0);
-	transition: 300ms;
+  opacity: 1;
+  transform: translateX(0);
+  transition: 300ms;
 }
 
 .fade-exit {
-	opacity: 1;
+  opacity: 1;
 }
 
 .fade-exit-active {
-	opacity: 0;
-	transform: scale(0.9);
-	transition: 300ms;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: 300ms;
+}
+
+/* SLIDE LEFT */
+
+.slide-left-enter,
+.slide-left-appear {
+  transform: translateX(100%);
+}
+
+.slide-left-enter-active,
+.slide-left-appear-active {
+  transform: translateX(0%);
+  transition: 0.5s;
+}
+
+.slide-left-exit {
+  opacity: 1;
+}
+
+.slide-left-exit-active {
+  transform: translateX(100%);
+  transition: 0.5s;
 }

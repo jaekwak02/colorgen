@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 
-const SlideOutPanel = ({ onClose, children }) => {
+const SlideOutPanel = ({ isOpen, onClose, children }) => {
   useEffect(() => {
     const listener = (e) => {
       if (e.key === "Escape") {
@@ -16,20 +16,34 @@ const SlideOutPanel = ({ onClose, children }) => {
   }, []); // eslint-disable-line
 
   return ReactDOM.createPortal(
-    <StyledContainer>
-      <StyledContent>{children}</StyledContent>
-      <StyledCloseAction onClick={() => onClose()}>Close</StyledCloseAction>
-    </StyledContainer>,
+    <>
+      {isOpen && <StyledBackground onClick={() => onClose()} />}
+
+      <StyledContainer
+        style={{ transform: isOpen ? "translateX(0%)" : "translateX(100%)" }}
+      >
+        <StyledContent>{children}</StyledContent>
+        <StyledCloseAction onClick={() => onClose()}>Close</StyledCloseAction>
+      </StyledContainer>
+    </>,
     document.body
   );
 };
 
+const StyledBackground = styled.div`
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+`;
+
 const StyledContainer = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0px;
   right: 0px;
   bottom: 0px;
-  width: 800px;
+  width: 600px;
   background-color: var(--color-neutral-400);
   border-left: 1px solid var(--color-neutral-500);
   box-shadow: var(--box-shadow-3);
@@ -37,10 +51,13 @@ const StyledContainer = styled.div`
   display: grid;
   grid-template-rows: 1fr auto;
   gap: 30px;
+
+  transition: 0.5s;
 `;
 
 const StyledContent = styled.div`
   padding: 30px;
+  overflow-y: auto;
 `;
 
 const StyledCloseAction = styled.div`
