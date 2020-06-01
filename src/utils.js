@@ -74,6 +74,13 @@ export const generateTheme = (scheme, withNeutral) => {
     colors.push(color.hex());
     colors.push(rightColor.hex());
   } else if (scheme === "tetradic") {
+    const color1 = color.hue(color.hue() + 60);
+    const color2 = color.hue(color.hue() + 180);
+    const color3 = color.hue(color.hue() + 240);
+    colors.push(color.hex());
+    colors.push(color1.hex());
+    colors.push(color2.hex());
+    colors.push(color3.hex());
   }
 
   if (withNeutral) {
