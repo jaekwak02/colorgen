@@ -5,7 +5,7 @@ import { calculateColor } from "../utils";
 const ThemeOption = ({ theme, isActive, ...rest }) => {
   return (
     <ElContainer isActive={isActive} {...rest}>
-      <div>{theme.name || "Untitled Theme"}</div>
+      <ElTitle>{theme.name || "Untitled Theme"}</ElTitle>
       <ElColors>
         {theme.colors.map((color, colorIndex) => (
           <ElColor style={{ backgroundColor: color.color }} key={colorIndex}>
@@ -29,9 +29,7 @@ const ThemeOption = ({ theme, isActive, ...rest }) => {
 };
 
 const ElContainer = styled.div`
-  position:relative;
-  display: grid;
-  gap: 5px;
+  position: relative;
 
   color: var(--color-neutral-700);
 
@@ -49,6 +47,10 @@ const ElContainer = styled.div`
         background-color: white;
       `,
     }[props.isActive])} */
+`;
+
+const ElTitle = styled.div`
+  height: 30px;
 `;
 
 const ElColors = styled.div`
@@ -79,13 +81,13 @@ const ElColor = styled.div`
 
 const ElActiveIndicator = styled.div`
   position: absolute;
-  top: 50%;
-  left: -25px;
-  transform: translateY(-50%);
+  top: 30px;
+  left: -20px;
+  /* transform: translateY(-50%); */
 
   border-right: 15px solid var(--color-neutral-700);
-  border-top: 50px solid transparent;
-  border-bottom: 50px solid transparent;
+  border-top: 60px solid transparent;
+  border-bottom: 60px solid transparent;
 `;
 
 export default ThemeOption;

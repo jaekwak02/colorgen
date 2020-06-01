@@ -24,7 +24,7 @@ const ElContainer = styled.div`
 
 const ElContent = styled.div`
   display: grid;
-  align-items: start;
+  align-content: start;
   gap: 30px;
 `;
 

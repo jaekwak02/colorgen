@@ -1,8 +1,8 @@
 import React from "react";
 import styled, { css } from "styled-components";
 
-const Badge = ({ success = false, error = false, ...props }) => (
-  <ElContainer success={success} error={error} {...props} />
+const Badge = ({ info = false, success = false, error = false, ...props }) => (
+  <ElContainer info={info} success={success} error={error} {...props} />
 );
 
 const ElContainer = styled.div`
@@ -12,6 +12,14 @@ const ElContainer = styled.div`
   border-radius: 3px;
 
   font-size: 0.85rem;
+
+  ${(props) =>
+    props.info &&
+    css`
+      border-color: var(--color-primary-600);
+      background-color: var(--color-primary-100);
+      color: var(--color-primary-600);
+    `}
 
   ${(props) =>
     props.success &&
@@ -24,9 +32,9 @@ const ElContainer = styled.div`
   ${(props) =>
     props.error &&
     css`
-      border-color: var(--color-error-500);
+      border-color: var(--color-error-600);
       background-color: var(--color-error-100);
-      color: var(--color-error-500);
+      color: var(--color-error-600);
     `}
 `;
 

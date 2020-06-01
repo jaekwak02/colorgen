@@ -21,7 +21,24 @@ import HorizontalLayout from "../components/HorizontalLayout";
 import SidebarLayout from "../components/SidebarLayout";
 import Divider from "../components/Divider";
 import Badge from "../components/Badge";
-import { calculateColor, getSavedThemes, saveTheme } from "../utils";
+import ThemeGenerator from "../components/ThemeGenerator";
+import {
+  calculateColor,
+  getSavedThemes,
+  saveTheme,
+  generateTheme,
+} from "../utils";
+
+const DEFAULT_SCHEME = "analogous";
+
+const DEFAULT_COLORS = generateTheme(DEFAULT_SCHEME, true).map(
+  (color, colorIndex) => ({
+    color,
+    name: `color-${colorIndex + 1}`,
+    increment: 18,
+    index: 3,
+  })
+);
 
 const DEFAULT_STATE = {
   editingIndex: 0,
@@ -30,28 +47,34 @@ const DEFAULT_STATE = {
   saveKey: null,
   savedThemes: getSavedThemes(),
   theme: {
+    generator: {
+      locked: false,
+      scheme: DEFAULT_SCHEME,
+      base: "",
+    },
     name: "",
     segmentLength: 9,
-    colors: [
-      {
-        color: "#0073B8",
-        name: "primary",
-        increment: 18,
-        index: 3,
-      },
-      {
-        color: "#8B11A8",
-        name: "secondary",
-        increment: 18,
-        index: 3,
-      },
-      {
-        color: "#888888",
-        name: "neutral",
-        increment: 18,
-        index: 3,
-      },
-    ],
+    colors: DEFAULT_COLORS,
+    // colors: [
+    //   {
+    //     color: "#0073B8",
+    //     name: "primary",
+    //     increment: 18,
+    //     index: 3,
+    //   },
+    //   {
+    //     color: "#8B11A8",
+    //     name: "secondary",
+    //     increment: 18,
+    //     index: 3,
+    //   },
+    //   {
+    //     color: "#888888",
+    //     name: "neutral",
+    //     increment: 18,
+    //     index: 3,
+    //   },
+    // ],
   },
 };
 
@@ -86,6 +109,21 @@ const HomePage = () => {
         state.saveKey = key;
         state.theme = clone(theme);
         state.saved = true;
+        break;
+      }
+      case "SET_GENERATOR": {
+        const [generator] = data;
+        state.theme.generator = generator;
+        break;
+      }
+      case "GENERATED": {
+        const [colors] = data;
+        state.theme.colors = colors.map((color, colorIndex) => ({
+          color,
+          name: `color-${colorIndex + 1}`,
+          increment: 18,
+          index: 3,
+        }));
         break;
       }
       case "ADD_COLOR": {
@@ -218,6 +256,15 @@ const HomePage = () => {
               </>
             }
           >
+            <h3>1. Generate</h3>
+            <ThemeGenerator
+              theme={state.theme}
+              onGeneratorChange={(generator) =>
+                dispatch("SET_GENERATOR", [generator])
+              }
+              onGenerate={(colors) => dispatch("GENERATED", [colors])}
+            />
+            <h3>2. Alter</h3>
             {state.theme.colors.map((color, colorIndex) => {
               const isEditing =
                 state.isEditing && state.editingIndex === colorIndex;
@@ -251,7 +298,7 @@ const HomePage = () => {
             <div>
               <Button onClick={() => dispatch("ADD_COLOR")}>Add Color</Button>
             </div>
-            <h3>Export</h3>
+            <h3>3. Export</h3>
             <div>
               <VerticalLayout>
                 {state.theme.colors.map((color, colorIndex) => (

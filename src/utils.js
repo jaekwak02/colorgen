@@ -41,3 +41,45 @@ export const saveTheme = (theme, saveKey) => {
 
   return key;
 };
+
+export const generateRandomColor = () => {
+  const h = Math.random() * 360;
+  const s = 15 + Math.random() * 85;
+  const l = 15 + Math.random() * 70;
+
+  return Color.hsl(h, s, l);
+};
+
+export const generateTheme = (scheme, withNeutral) => {
+  const color = generateRandomColor();
+  const colors = [];
+
+  if (scheme === "monochromatic") {
+    colors.push(color.hex());
+  } else if (scheme === "analogous") {
+    const leftColor = color.hue(color.hue() - 30);
+    const rightColor = color.hue(color.hue() + 30);
+    colors.push(leftColor.hex());
+    colors.push(color.hex());
+    colors.push(rightColor.hex());
+  } else if (scheme === "complementary") {
+    const complementColor = color.hue(color.hue() + 180);
+    colors.push(color.hex());
+    colors.push(complementColor.hex());
+  } else if (scheme === "split-complementary") {
+    const complementColor = color.hue(color.hue() + 180);
+    const leftColor = complementColor.hue(complementColor.hue() - 30);
+    const rightColor = complementColor.hue(complementColor.hue() + 30);
+    colors.push(leftColor.hex());
+    colors.push(color.hex());
+    colors.push(rightColor.hex());
+  } else if (scheme === "tetradic") {
+  }
+
+  if (withNeutral) {
+    const neutralColor = Color().hsl(0, 0, color.lightness());
+    colors.push(neutralColor.hex());
+  }
+
+  return colors;
+};
