@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Color from "color";
 import Joi from "@hapi/joi";
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
 import VerticalLayout from "../components/VerticalLayout";
+import HorizontalLayout from "../components/HorizontalLayout";
 import RadioInput from "../components/RadioInput";
-import { generateTheme } from "../utils";
+import { generateTheme, isValidColorHex } from "../utils";
 
 const schemeOptions = [
   { label: "Monochromatic", value: "monochromatic" },
@@ -17,6 +19,8 @@ const schemeOptions = [
 
 const generatorSchema = Joi.object({
   scheme: Joi.string(),
+  base: Joi.string(),
+  locked: Joi.bool(),
 });
 
 const ThemeGenerator = ({
@@ -29,32 +33,82 @@ const ThemeGenerator = ({
     allowUnknown: false,
   });
 
+  const [baseColorInput, setBaseColorInput] = useState(generator.base);
+
   return (
     <ElContainer>
       <VerticalLayout>
-        <RadioInput
-          value={generator.scheme}
-          onChange={(scheme) => onGeneratorChange({ ...generator, scheme })}
-          options={schemeOptions}
-        />
+        {!generator.locked && (
+          <HorizontalLayout style={{ alignItems: "start" }}>
+            <VerticalLayout>
+              <div>Scheme</div>
+              <RadioInput
+                value={generator.scheme}
+                onChange={(scheme) =>
+                  onGeneratorChange({ ...generator, scheme })
+                }
+                options={schemeOptions}
+              />
+            </VerticalLayout>
+            <VerticalLayout>
+              <div>Base Color</div>
+              <HorizontalLayout>
+                <TextInput
+                  value={baseColorInput}
+                  onChange={(e) => {
+                    setBaseColorInput(e.target.value);
 
-        {/* <div>
-          <Badge info>
-            {schemeOptions.find((o) => o.value === generator.scheme)?.label}
-          </Badge>
-        </div> */}
+                    if (
+                      isValidColorHex(e.target.value) ||
+                      e.target.value === ""
+                    ) {
+                      onGeneratorChange({
+                        ...generator,
+                        base: e.target.value.toUpperCase(),
+                      });
+                    }
+                  }}
+                />
+                <ElBaseIndicator
+                  style={{
+                    backgroundColor:
+                      generator.base || "var(--color-neutral-200)",
+                  }}
+                >
+                  {!generator.base && "✕"}
+                </ElBaseIndicator>
+              </HorizontalLayout>
+            </VerticalLayout>
+          </HorizontalLayout>
+        )}
 
-        <div>
+        <HorizontalLayout>
+          {!generator.locked && (
+            <Button
+              onClick={() => {
+                const colors = generateTheme(
+                  generator.scheme,
+                  true,
+                  generator.base
+                );
+
+                onGenerate(colors);
+              }}
+            >
+              Generate
+            </Button>
+          )}
           <Button
             onClick={() => {
-              const colors = generateTheme(generator.scheme, true);
-
-              onGenerate(colors);
+              onGeneratorChange({
+                ...generator,
+                locked: !generator.locked,
+              });
             }}
           >
-            Generate
+            {generator.locked ? "Unlock" : "Lock"}
           </Button>
-        </div>
+        </HorizontalLayout>
 
         <ElColors>
           {theme.colors.map((color, colorIndex) => {
@@ -78,11 +132,7 @@ const ThemeGenerator = ({
   );
 };
 
-const ElContainer = styled.div`
-  /* display: grid;
-  padding: 30px; */
-  /* border: 1px solid var(--color-neutral-500); */
-`;
+const ElContainer = styled.div``;
 
 const ElColors = styled.div`
   border: 1px solid var(--color-neutral-600);
@@ -100,6 +150,18 @@ const ElColor = styled.div`
   display: grid;
   align-items: center;
   justify-items: center;
+`;
+
+const ElBaseIndicator = styled.div`
+  height: 30px;
+  width: 30px;
+  border: 1px solid var(--color-neutral-500);
+
+  display: grid;
+  align-items: center;
+  justify-items: center;
+
+  user-select: none;
 `;
 
 export default ThemeGenerator;

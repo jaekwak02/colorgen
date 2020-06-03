@@ -1,8 +1,9 @@
 import React, { useReducer, useEffect } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import color from "color";
 import MarkerContainer from "./MarkerContainer";
 import TextInput from "./TextInput";
+import { isValidColorHex } from "../utils";
 import { lerp } from "../utils/utils";
 
 const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
@@ -17,7 +18,7 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
         case "COLOR_INPUT": {
           state.colorInput = data;
 
-          if (/^#[0-9a-f]{6}$/i.test(state.colorInput)) {
+          if (isValidColorHex(state.colorInput)) {
             const {
               defaultHuePosition,
               defaultHue,

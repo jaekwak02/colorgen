@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
-const TextInput = ({ value, ...rest }) => {
-  return <ElInput value={value || ""} {...rest} />;
-};
+const TextInput = ({ value, ...rest }) => (
+  <ElInput value={value || ""} {...rest} />
+);
 
 const ElInput = styled.input`
   border: 1px solid var(--color-neutral-500);

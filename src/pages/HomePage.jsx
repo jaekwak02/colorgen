@@ -1,5 +1,6 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect, useState } from "react";
 import clone from "clone";
+import Color from "color";
 import ColorRow from "../components/ColorRow";
 import ColorCell from "../components/ColorCell";
 import ColorCellLayout from "../components/ColorCellLayout";
@@ -10,6 +11,7 @@ import PageLayout from "../components/PageLayout";
 import CodeBlock from "../components/CodeBlock";
 import TextInput from "../components/TextInput";
 import NumberInput from "../components/NumberInput";
+import NumberIncrementInput from "../components/NumberIncrementInput";
 import Button from "../components/Button";
 import ThemeLayout from "../components/ThemeLayout";
 import ThemeOption from "../components/ThemeOption";
@@ -31,19 +33,12 @@ import {
 
 const DEFAULT_SCHEME = "analogous";
 
-const DEFAULT_COLORS = generateTheme(DEFAULT_SCHEME, true).map(
-  (color, colorIndex) => ({
-    color,
-    name: `color-${colorIndex + 1}`,
-    increment: 18,
-    index: 3,
-  })
-);
+const DEFAULT_COLORS = generateTheme(DEFAULT_SCHEME, true);
 
 const DEFAULT_STATE = {
   editingIndex: 0,
   isEditing: false,
-  saved: true,
+  saved: false,
   saveKey: null,
   savedThemes: getSavedThemes(),
   theme: {
@@ -55,30 +50,21 @@ const DEFAULT_STATE = {
     name: "",
     segmentLength: 9,
     colors: DEFAULT_COLORS,
-    // colors: [
-    //   {
-    //     color: "#0073B8",
-    //     name: "primary",
-    //     increment: 18,
-    //     index: 3,
-    //   },
-    //   {
-    //     color: "#8B11A8",
-    //     name: "secondary",
-    //     increment: 18,
-    //     index: 3,
-    //   },
-    //   {
-    //     color: "#888888",
-    //     name: "neutral",
-    //     increment: 18,
-    //     index: 3,
-    //   },
-    // ],
   },
 };
 
 const HomePage = () => {
+  const [quickEditedIndex, setQuickEditedIndex] = useState(null);
+  const [quickEditedCount, setQuickEditedCount] = useState(0);
+
+  useEffect(() => {
+    if (quickEditedIndex !== null) {
+      const timeout = setTimeout(() => setQuickEditedIndex(null), 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [quickEditedIndex, quickEditedCount]);
+
   const [state, dispatchRaw] = useReducer((oldState, action) => {
     const [type, data] = action;
 
@@ -114,16 +100,13 @@ const HomePage = () => {
       case "SET_GENERATOR": {
         const [generator] = data;
         state.theme.generator = generator;
+        state.saved = false;
         break;
       }
       case "GENERATED": {
         const [colors] = data;
-        state.theme.colors = colors.map((color, colorIndex) => ({
-          color,
-          name: `color-${colorIndex + 1}`,
-          increment: 18,
-          index: 3,
-        }));
+        state.theme.colors = colors;
+        state.saved = false;
         break;
       }
       case "ADD_COLOR": {
@@ -135,6 +118,7 @@ const HomePage = () => {
         });
         state.isEditing = true;
         state.editingIndex = state.theme.colors.length - 1;
+        state.saved = false;
         break;
       }
       case "SET_NAME": {
@@ -164,6 +148,50 @@ const HomePage = () => {
       case "SET_COLOR_INDEX": {
         const [index, indexValue] = data;
         state.theme.colors[index].index = indexValue;
+        state.saved = false;
+        break;
+      }
+      case "SET_COLOR_HUE": {
+        const [index, hue] = data;
+        const original = state.theme.colors[index].color;
+        const currentColor = Color(state.theme.colors[index].color);
+        state.theme.colors[index].color = currentColor.hue(hue).hex();
+        if (state.theme.colors[index] === original) {
+          const currentColor = Color(state.theme.colors[index].color);
+          state.theme.colors[index].color = currentColor.hue(hue).hex();
+        }
+        state.saved = false;
+        break;
+      }
+      case "SET_COLOR_SATURATION": {
+        const [index, saturation] = data;
+        const original = state.theme.colors[index].color;
+        const currentColor = Color(state.theme.colors[index].color);
+        state.theme.colors[index].color = currentColor
+          .saturationl(saturation)
+          .hex();
+        if (state.theme.colors[index] === original) {
+          const currentColor = Color(state.theme.colors[index].color);
+          state.theme.colors[index].color = currentColor
+            .saturationl(saturation)
+            .hex();
+        }
+        state.saved = false;
+        break;
+      }
+      case "SET_COLOR_LIGHTNESS": {
+        const [index, lightness] = data;
+        const original = state.theme.colors[index].color;
+        const currentColor = Color(state.theme.colors[index].color);
+        state.theme.colors[index].color = currentColor
+          .lightness(lightness)
+          .hex();
+        if (state.theme.colors[index] === original) {
+          const currentColor = Color(state.theme.colors[index].color);
+          state.theme.colors[index].color = currentColor
+            .lightness(lightness)
+            .hex();
+        }
         state.saved = false;
         break;
       }
@@ -206,15 +234,20 @@ const HomePage = () => {
           <SidebarLayout
             rightSidebar={
               <>
-                <VerticalLayout>
-                  <div>{state.saveKey ? "Current Save" : "Unsaved Theme"}</div>
-                  <div>
-                    <TextInput
-                      value={state.theme.name}
-                      onChange={(e) => dispatch("SET_NAME", [e.target.value])}
-                      placeholder="Theme Name"
-                    />
-                  </div>
+                <VerticalLayout style={{ position: "relative" }}>
+                  <HorizontalLayout>
+                    <div>{state.saveKey ? "Current Save" : "New Save"}</div>
+                    {state.saved ? (
+                      <Badge success>Saved</Badge>
+                    ) : (
+                      <Badge error>Unsaved</Badge>
+                    )}
+                  </HorizontalLayout>
+                  <TextInput
+                    value={state.theme.name}
+                    onChange={(e) => dispatch("SET_NAME", [e.target.value])}
+                    placeholder="Theme Name"
+                  />
                   <HorizontalLayout>
                     <Button
                       isDisabled={!state.saveKey}
@@ -234,24 +267,30 @@ const HomePage = () => {
                       Save As New
                     </Button>
                   </HorizontalLayout>
-                  <div>
-                    {state.saved ? (
-                      <Badge success>Saved</Badge>
-                    ) : (
-                      <Badge error>Unsaved Changes</Badge>
-                    )}
-                  </div>
                 </VerticalLayout>
                 <Divider />
+                {state.saveKey && (
+                  <ThemeOption
+                    isActive
+                    theme={
+                      state.savedThemes.find(
+                        (save) => save.key === state.saveKey
+                      ).theme
+                    }
+                  />
+                )}
+                {state.saveKey && <Divider />}
                 <ThemeLayout>
-                  {state.savedThemes.map((save, themeIndex) => (
-                    <ThemeOption
-                      key={themeIndex}
-                      isActive={save.key === state.saveKey}
-                      theme={save.theme}
-                      onClick={() => dispatch("LOAD", [save.key, save.theme])}
-                    />
-                  ))}
+                  {state.savedThemes.map((save, themeIndex) =>
+                    save.key === state.saveKey ? null : (
+                      <ThemeOption
+                        key={themeIndex}
+                        isActive={save.key === state.saveKey}
+                        theme={save.theme}
+                        onClick={() => dispatch("LOAD", [save.key, save.theme])}
+                      />
+                    )
+                  )}
                 </ThemeLayout>
               </>
             }
@@ -264,10 +303,11 @@ const HomePage = () => {
               }
               onGenerate={(colors) => dispatch("GENERATED", [colors])}
             />
-            <h3>2. Alter</h3>
+            <h3>2. Adjust</h3>
             {state.theme.colors.map((color, colorIndex) => {
               const isEditing =
                 state.isEditing && state.editingIndex === colorIndex;
+              const quickEditing = quickEditedIndex === colorIndex;
 
               return (
                 <div key={colorIndex}>
@@ -285,12 +325,52 @@ const HomePage = () => {
                             key={segmentIndex}
                             color={calculateColor(color.color, segmentDelta)}
                             isIndex={segmentDelta === 0}
-                            isEditing={isEditing}
+                            isEditing={isEditing || quickEditing}
                             delta={segmentDelta}
                           />
                         )
                       )}
                     </ColorCellLayout>
+                    <NumberIncrementInput
+                      value={color.increment}
+                      increment={0.5}
+                      onChange={(n) => {
+                        setQuickEditedIndex(colorIndex);
+                        setQuickEditedCount((x) => x + 1);
+                        dispatch("SET_COLOR_INCREMENT", [colorIndex, n]);
+                      }}
+                      formatter={(n) => `${n}%`}
+                    />
+                    <NumberIncrementInput
+                      value={color.index}
+                      onChange={(n) => {
+                        setQuickEditedIndex(colorIndex);
+                        setQuickEditedCount((x) => x + 1);
+                        dispatch("SET_COLOR_INDEX", [colorIndex, n]);
+                      }}
+                      formatter={(n) => n + 1}
+                    />
+                    <NumberIncrementInput
+                      value={Math.round(Color(color.color).hue())}
+                      onChange={(n) =>
+                        dispatch("SET_COLOR_HUE", [colorIndex, n])
+                      }
+                      formatter={(n) => n + 1}
+                    />
+                    <NumberIncrementInput
+                      value={Math.round(Color(color.color).saturationl())}
+                      onChange={(n) =>
+                        dispatch("SET_COLOR_SATURATION", [colorIndex, n])
+                      }
+                      formatter={(n) => n + 1}
+                    />
+                    <NumberIncrementInput
+                      value={Math.round(Color(color.color).lightness())}
+                      onChange={(n) =>
+                        dispatch("SET_COLOR_LIGHTNESS", [colorIndex, n])
+                      }
+                      formatter={(n) => n + 1}
+                    />
                   </ColorRow>
                 </div>
               );

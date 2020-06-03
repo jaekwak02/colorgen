@@ -71,7 +71,7 @@ const ElColors = styled.div`
 
 const ElColor = styled.div`
   background-color: var(--color-neutral-600);
-  padding-left: 100px;
+  padding-left: 60px;
 
   display: grid;
   gap: 1px;

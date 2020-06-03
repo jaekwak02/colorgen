@@ -1,10 +1,15 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
-const InputDiv = styled.input``;
+const TextInput = ({ value, onChange, ...rest }) => (
+  <ElInput
+    type="text"
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    {...rest}
+  />
+);
 
-function TextInput({ value, onChange }) {
-	return <InputDiv type="text" value={value} onChange={e => onChange(e.target.value)} />;
-}
+const ElInput = styled.input``;
 
 export default TextInput;

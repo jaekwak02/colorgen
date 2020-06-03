@@ -12,6 +12,7 @@ const ElContainer = styled.div`
   border-radius: 3px;
 
   font-size: 0.85rem;
+  white-space: nowrap;
 
   ${(props) =>
     props.info &&

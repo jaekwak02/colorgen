@@ -19,7 +19,7 @@ const SidebarLayout = ({ leftSidebar, rightSidebar, children }) => {
 const ElContainer = styled.div`
   display: grid;
   grid-auto-flow: column;
-  gap: 30px;
+  gap: 60px;
 `;
 
 const ElContent = styled.div`

@@ -50,43 +50,49 @@ export const generateRandomColor = () => {
   return Color.hsl(h, s, l);
 };
 
-export const generateTheme = (scheme, withNeutral) => {
-  const color = generateRandomColor();
+export const generateTheme = (scheme, withNeutral, baseColorHex) => {
+  const color = baseColorHex ? Color(baseColorHex) : generateRandomColor();
   const colors = [];
 
   if (scheme === "monochromatic") {
-    colors.push(color.hex());
+    colors.push({ name: "primary", color: color.hex() });
   } else if (scheme === "analogous") {
     const leftColor = color.hue(color.hue() - 30);
     const rightColor = color.hue(color.hue() + 30);
-    colors.push(leftColor.hex());
-    colors.push(color.hex());
-    colors.push(rightColor.hex());
+    colors.push({ name: "secondary-left", color: leftColor.hex() });
+    colors.push({ name: "primary", color: color.hex() });
+    colors.push({ name: "secondary-right", color: rightColor.hex() });
   } else if (scheme === "complementary") {
     const complementColor = color.hue(color.hue() + 180);
-    colors.push(color.hex());
-    colors.push(complementColor.hex());
+    colors.push({ name: "primary", color: color.hex() });
+    colors.push({ name: "complement", color: complementColor.hex() });
   } else if (scheme === "split-complementary") {
     const complementColor = color.hue(color.hue() + 180);
     const leftColor = complementColor.hue(complementColor.hue() - 30);
     const rightColor = complementColor.hue(complementColor.hue() + 30);
-    colors.push(leftColor.hex());
-    colors.push(color.hex());
-    colors.push(rightColor.hex());
+    colors.push({ name: "complement-left", color: leftColor.hex() });
+    colors.push({ name: "primary", color: color.hex() });
+    colors.push({ name: "complement-right", color: rightColor.hex() });
   } else if (scheme === "tetradic") {
     const color1 = color.hue(color.hue() + 60);
     const color2 = color.hue(color.hue() + 180);
     const color3 = color.hue(color.hue() + 240);
-    colors.push(color.hex());
-    colors.push(color1.hex());
-    colors.push(color2.hex());
-    colors.push(color3.hex());
+    colors.push({ name: "color-1", color: color.hex() });
+    colors.push({ name: "color-2", color: color1.hex() });
+    colors.push({ name: "color-3", color: color2.hex() });
+    colors.push({ name: "color-4", color: color3.hex() });
   }
 
   if (withNeutral) {
     const neutralColor = Color().hsl(0, 0, color.lightness());
-    colors.push(neutralColor.hex());
+    colors.push({ name: "neutral", color: neutralColor.hex() });
   }
 
-  return colors;
+  return colors.map((color) => ({
+    ...color,
+    increment: 18,
+    index: 3,
+  }));
 };
+
+export const isValidColorHex = (input) => /^#[0-9a-f]{6}$/i.test(input);
