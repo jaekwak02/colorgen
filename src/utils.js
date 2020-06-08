@@ -1,5 +1,10 @@
 import Color from "color";
 
+export const lerp = (a, b, t) => a + (b - a) * t;
+
+export const clamp = (value, min = 0, max = 1) =>
+  Math.round(Math.min(Math.max(value, min), max));
+
 export const calculateColor = (base, delta) => {
   const baseColor = Color(base);
   const targetColor = Color(delta > 0 ? "white" : "black");

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { clamp } from "../utils/utils";
+import { clamp } from "../utils";
 
 const MarkerContainer = ({
   position,

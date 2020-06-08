@@ -2,9 +2,8 @@ import React, { useReducer, useEffect } from "react";
 import styled from "styled-components";
 import Color from "color";
 import MarkerContainer from "./MarkerContainer";
-import TextInput from "../components/TextInput";
-import { isValidColorHex } from "../utils";
-import { lerp } from "../utils/utils";
+import TextInput from "./TextInput";
+import { isValidColorHex, lerp } from "../utils";
 
 const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
   const size = 400;
