@@ -71,8 +71,11 @@ const ElTitle = styled.div`
 `;
 
 const ElDelete = styled.div`
-  cursor: pointer;
   font-weight: 700;
+
+  cursor: pointer;
+
+  user-select: none;
 
   &:hover {
     color: var(--color-error-400);

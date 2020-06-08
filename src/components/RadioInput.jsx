@@ -16,12 +16,13 @@ const RadioInput = ({ value, onChange, options = [] }) => {
 
 const ElContainer = styled.div`
   display: grid;
-  gap: 10px;
   align-content: flex-start;
   justify-items: start;
 `;
 
 const ElOption = styled.div`
+  height: 30px;
+
   display: grid;
   gap: 10px;
   grid-template-columns: auto auto 1fr;

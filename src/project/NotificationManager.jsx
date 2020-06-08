@@ -81,7 +81,7 @@ const ElAnchor = styled.div`
 const ElNotifications = styled(TransitionGroup)`
   display: grid;
   gap: 15px;
-  justify-content: center;
+  justify-items: center;
   align-content: flex-start;
 `;
 
