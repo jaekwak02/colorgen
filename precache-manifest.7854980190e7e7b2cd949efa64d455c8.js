@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "3240fa44f7981095d3393b290dcac75d",
+    "revision": "45fc828207d45f81d6b827ec8c0ff0e2",
     "url": "/colorgen/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/colorgen/static/css/2.e6f31816.chunk.css"
   },
   {
-    "revision": "1729307038d8c4a2cc34",
-    "url": "/colorgen/static/css/main.b316290d.chunk.css"
+    "revision": "93d8ae4d07a0482c66e2",
+    "url": "/colorgen/static/css/main.7217d769.chunk.css"
   },
   {
     "revision": "4c07faa8bd660c072750",
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/colorgen/static/js/2.25c150ea.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "1729307038d8c4a2cc34",
-    "url": "/colorgen/static/js/main.92346dde.chunk.js"
+    "revision": "93d8ae4d07a0482c66e2",
+    "url": "/colorgen/static/js/main.672f30be.chunk.js"
   },
   {
     "revision": "dc6dc55741556c882624",
