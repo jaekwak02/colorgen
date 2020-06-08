@@ -1,6 +1,5 @@
 import React, { useReducer, useEffect, useState } from "react";
 import clone from "clone";
-import Color from "color";
 import ColorRow from "../components/ColorRow";
 import ColorCell from "../components/ColorCell";
 import ColorCellLayout from "../components/ColorCellLayout";
@@ -12,6 +11,7 @@ import CodeBlock from "../components/CodeBlock";
 import TextInput from "../components/TextInput";
 import NumberInput from "../components/NumberInput";
 import NumberIncrementInput from "../components/NumberIncrementInput";
+import ColorDisplay from "../components/ColorDisplay";
 import Button from "../components/Button";
 import ThemeLayout from "../components/ThemeLayout";
 import ThemeOption from "../components/ThemeOption";
@@ -24,12 +24,15 @@ import SidebarLayout from "../components/SidebarLayout";
 import Divider from "../components/Divider";
 import Badge from "../components/Badge";
 import ThemeGenerator from "../components/ThemeGenerator";
+import Modal from "../components/Modal";
 import {
   calculateColor,
   getSavedThemes,
   saveTheme,
+  deleteTheme,
   generateTheme,
 } from "../utils";
+import { useNotificationContext } from "../hooks";
 
 const DEFAULT_SCHEME = "analogous";
 
@@ -37,7 +40,11 @@ const DEFAULT_COLORS = generateTheme(DEFAULT_SCHEME, true);
 
 const DEFAULT_STATE = {
   editingIndex: 0,
+  deletingKey: 0,
+  deletingColorIndex: 0,
   isEditing: false,
+  isDeleting: false,
+  isDeletingColor: false,
   saved: false,
   saveKey: null,
   savedThemes: getSavedThemes(),
@@ -54,6 +61,7 @@ const DEFAULT_STATE = {
 };
 
 const HomePage = () => {
+  const notification = useNotificationContext();
   const [quickEditedIndex, setQuickEditedIndex] = useState(null);
   const [quickEditedCount, setQuickEditedCount] = useState(0);
 
@@ -72,13 +80,24 @@ const HomePage = () => {
 
     switch (type) {
       case "START_EDIT": {
-        const [value] = data;
+        const [index] = data;
         state.isEditing = true;
-        state.editingIndex = value;
+        state.editingIndex = index;
         break;
       }
       case "STOP_EDIT": {
         state.isEditing = false;
+        break;
+      }
+      case "START_DELETE": {
+        const [key] = data;
+        state.isDeleting = true;
+        state.deletingKey = key;
+        break;
+      }
+      case "STOP_DELETE": {
+        state.isDeleting = false;
+        state.savedThemes = getSavedThemes();
         break;
       }
       case "SAVED": {
@@ -121,6 +140,31 @@ const HomePage = () => {
         state.saved = false;
         break;
       }
+      case "REORDER_COLOR": {
+        const [index, direction] = data;
+        const target = state.theme.colors.splice(index, 1)[0];
+        if (direction < 0) {
+          state.theme.colors.splice(index + 1, 0, target);
+        } else {
+          state.theme.colors.splice(index - 1, 0, target);
+        }
+        state.saved = false;
+        break;
+      }
+      case "START_DELETE_COLOR": {
+        const [index] = data;
+        state.isDeletingColor = true;
+        state.deletingColorIndex = index;
+        break;
+      }
+      case "STOP_DELETE_COLOR": {
+        const [confirm] = data;
+        state.isDeletingColor = false;
+        if (confirm) {
+          state.theme.colors.splice(state.deletingColorIndex, 1);
+        }
+        break;
+      }
       case "SET_NAME": {
         const [name] = data;
         state.theme.name = name;
@@ -151,50 +195,6 @@ const HomePage = () => {
         state.saved = false;
         break;
       }
-      case "SET_COLOR_HUE": {
-        const [index, hue] = data;
-        const original = state.theme.colors[index].color;
-        const currentColor = Color(state.theme.colors[index].color);
-        state.theme.colors[index].color = currentColor.hue(hue).hex();
-        if (state.theme.colors[index] === original) {
-          const currentColor = Color(state.theme.colors[index].color);
-          state.theme.colors[index].color = currentColor.hue(hue).hex();
-        }
-        state.saved = false;
-        break;
-      }
-      case "SET_COLOR_SATURATION": {
-        const [index, saturation] = data;
-        const original = state.theme.colors[index].color;
-        const currentColor = Color(state.theme.colors[index].color);
-        state.theme.colors[index].color = currentColor
-          .saturationl(saturation)
-          .hex();
-        if (state.theme.colors[index] === original) {
-          const currentColor = Color(state.theme.colors[index].color);
-          state.theme.colors[index].color = currentColor
-            .saturationl(saturation)
-            .hex();
-        }
-        state.saved = false;
-        break;
-      }
-      case "SET_COLOR_LIGHTNESS": {
-        const [index, lightness] = data;
-        const original = state.theme.colors[index].color;
-        const currentColor = Color(state.theme.colors[index].color);
-        state.theme.colors[index].color = currentColor
-          .lightness(lightness)
-          .hex();
-        if (state.theme.colors[index] === original) {
-          const currentColor = Color(state.theme.colors[index].color);
-          state.theme.colors[index].color = currentColor
-            .lightness(lightness)
-            .hex();
-        }
-        state.saved = false;
-        break;
-      }
       default: {
         throw new Error(`${type} is not a valid action type.`);
       }
@@ -203,8 +203,6 @@ const HomePage = () => {
     return state;
   }, DEFAULT_STATE);
   const dispatch = (...args) => dispatchRaw(args);
-
-  console.log({ state });
 
   const colorSegments = state.theme.colors.map((color) => {
     return [...new Array(9)].map((_, i) => (i - color.index) * color.increment);
@@ -216,7 +214,7 @@ const HomePage = () => {
     state.theme.colors.forEach((color, colorIndex) => {
       colorSegments[colorIndex].forEach((segmentDelta, segmentIndex) => {
         const hex = calculateColor(color.color, segmentDelta);
-        s += `--color-${color.name}-${(segmentIndex + 1) * 100}: ${hex};\n`;
+        s += `--${color.name}-${(segmentIndex + 1) * 100}: ${hex};\n`;
       });
 
       s += "\n";
@@ -253,6 +251,7 @@ const HomePage = () => {
                       isDisabled={!state.saveKey}
                       onClick={() => {
                         const key = saveTheme(state.theme, state.saveKey);
+                        notification.send("Saved!");
                         dispatch("SAVED", [key]);
                       }}
                     >
@@ -261,6 +260,7 @@ const HomePage = () => {
                     <Button
                       onClick={() => {
                         const key = saveTheme(state.theme, null);
+                        notification.send("Saved as a New Theme!");
                         dispatch("SAVED", [key]);
                       }}
                     >
@@ -288,6 +288,7 @@ const HomePage = () => {
                         isActive={save.key === state.saveKey}
                         theme={save.theme}
                         onClick={() => dispatch("LOAD", [save.key, save.theme])}
+                        onDelete={() => dispatch("START_DELETE", [save.key])}
                       />
                     )
                   )}
@@ -304,6 +305,12 @@ const HomePage = () => {
               onGenerate={(colors) => dispatch("GENERATED", [colors])}
             />
             <h3>2. Adjust</h3>
+            <ColorDisplay
+              theme={state.theme}
+              onColorClick={(colorIndex) =>
+                dispatch("START_EDIT", [colorIndex])
+              }
+            />
             {state.theme.colors.map((color, colorIndex) => {
               const isEditing =
                 state.isEditing && state.editingIndex === colorIndex;
@@ -351,26 +358,29 @@ const HomePage = () => {
                       formatter={(n) => n + 1}
                     />
                     <NumberIncrementInput
-                      value={Math.round(Color(color.color).hue())}
+                      value={colorIndex}
                       onChange={(n) =>
-                        dispatch("SET_COLOR_HUE", [colorIndex, n])
+                        dispatch("REORDER_COLOR", [colorIndex, n - colorIndex])
                       }
-                      formatter={(n) => n + 1}
+                      showValue={false}
+                      incrementSymbol="⮝"
+                      decrementSymbol="⮟"
                     />
-                    <NumberIncrementInput
-                      value={Math.round(Color(color.color).saturationl())}
-                      onChange={(n) =>
-                        dispatch("SET_COLOR_SATURATION", [colorIndex, n])
-                      }
-                      formatter={(n) => n + 1}
-                    />
-                    <NumberIncrementInput
-                      value={Math.round(Color(color.color).lightness())}
-                      onChange={(n) =>
-                        dispatch("SET_COLOR_LIGHTNESS", [colorIndex, n])
-                      }
-                      formatter={(n) => n + 1}
-                    />
+                    <VerticalLayout style={{ alignContent: "center" }}>
+                      <Button
+                        onClick={() =>
+                          dispatch("START_DELETE_COLOR", [colorIndex])
+                        }
+                        style={{
+                          height: 40,
+                          width: 40,
+                          borderRadius: 20,
+                          padding: 0,
+                        }}
+                      >
+                        ✕
+                      </Button>
+                    </VerticalLayout>
                   </ColorRow>
                 </div>
               );
@@ -402,15 +412,23 @@ const HomePage = () => {
             onClose={() => dispatch("STOP_EDIT")}
           >
             {state.theme.colors[state.editingIndex] && (
-              <React.Fragment key={state.editingIndex}>
+              <React.Fragment key={`${state.isEditing}|${state.editingIndex}`}>
                 <VerticalLayout>
                   <h2>Color Picker</h2>
+                  <div
+                    style={{
+                      height: 60,
+                      backgroundColor:
+                        state.theme.colors[state.editingIndex].color,
+                    }}
+                  />
                   <ColorPicker
                     color={state.theme.colors[state.editingIndex].color}
                     setColor={(newColor) =>
                       dispatch("SET_COLOR", [state.editingIndex, newColor])
                     }
                   />
+                  <Divider />
                   <NumberInput
                     label="Value Increment"
                     value={state.theme.colors[state.editingIndex].increment}
@@ -437,24 +455,52 @@ const HomePage = () => {
           </SlideOutPanel>
         </TabPanel>
 
-        <Tab>Methodology</Tab>
-        <TabPanel>
-          <h3>Methodology - Work In Progress</h3>
-          <p>
-            Information about the methodology for generating colors will
-            eventually be published here.
-          </p>
-        </TabPanel>
-
         <Tab>About</Tab>
         <TabPanel>
-          <h3>About - Work In Progress</h3>
-          <p>
-            Information about the tool, code, and author will eventually be
-            published here.
-          </p>
+          <h2>About</h2>
+          <div>
+            Color Theme Generator is an original project created by Jae Young
+            Kwak. It is made using <a href="https://reactjs.org">ReactJS</a>.
+          </div>
+          <div>
+            To see the code, visit the{" "}
+            <a href="https://github.com/jaekwak02/colorgen">
+              Github Repository
+            </a>
+            .
+          </div>
         </TabPanel>
       </TabLayout>
+
+      {state.isDeleting && (
+        <Modal
+          title="Confirm Deletion"
+          cancelCallback={() => dispatch("STOP_DELETE")}
+          errorText="Delete"
+          errorCallback={() => {
+            deleteTheme(state.deletingKey);
+            notification.send("Deleted Theme");
+            dispatch("STOP_DELETE");
+          }}
+        >
+          Are you sure you want to delete this theme?
+        </Modal>
+      )}
+
+      {state.isDeletingColor && (
+        <Modal
+          title="Confirm Deletion"
+          cancelCallback={() => dispatch("STOP_DELETE_COLOR", [false])}
+          errorText="Remove"
+          errorCallback={() => {
+            deleteTheme(state.deletingKey);
+            notification.send("Removed Color");
+            dispatch("STOP_DELETE_COLOR", [true]);
+          }}
+        >
+          Are you sure you want to remove this color?
+        </Modal>
+      )}
     </PageLayout>
   );
 };

@@ -15,7 +15,7 @@ const MarkerContainer = ({
 
   useEffect(() => {
     const mouseUpListener = () => (mouseDownRef.current = false);
-    const mouseMoveListener = e => {
+    const mouseMoveListener = (e) => {
       if (mouseDownRef.current) {
         setPosition([
           clamp(
@@ -27,7 +27,7 @@ const MarkerContainer = ({
             e.clientY - colorPickerRef.current.getBoundingClientRect().top,
             0,
             height
-          )
+          ),
         ]);
       }
     };
@@ -41,11 +41,11 @@ const MarkerContainer = ({
     };
   }, [width, height, setPosition]);
 
-  const handleColorSelect = e => {
+  const handleColorSelect = (e) => {
     if (mouseDownRef.current) {
       setPosition([
         e.clientX - e.target.getBoundingClientRect().left,
-        e.clientY - e.target.getBoundingClientRect().top
+        e.clientY - e.target.getBoundingClientRect().top,
       ]);
     }
   };
@@ -54,14 +54,14 @@ const MarkerContainer = ({
     <ElContainer
       {...rest}
       ref={colorPickerRef}
-      onMouseDown={e => {
+      onMouseDown={(e) => {
         mouseDownRef.current = true;
         handleColorSelect(e);
       }}
       style={{
         ...style,
         width,
-        height
+        height,
       }}
     />
   );

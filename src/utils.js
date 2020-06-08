@@ -42,37 +42,51 @@ export const saveTheme = (theme, saveKey) => {
   return key;
 };
 
-export const generateRandomColor = () => {
-  const h = Math.random() * 360;
-  const s = 15 + Math.random() * 85;
-  const l = 15 + Math.random() * 70;
+export const deleteTheme = (key) => {
+  localStorage.removeItem(`COLOR-THEME:${key}`);
+};
+
+export const randomNumber = (min, max) => min + Math.random() * (max - min);
+
+export const generateRandomColor = (generator) => {
+  const h = randomNumber(generator?.hueMin || 0, generator?.hueMax || 360);
+  const s = randomNumber(
+    generator?.saturationMin || 15,
+    generator?.saturationMax || 100
+  );
+  const l = randomNumber(
+    generator?.lightnessMin || 15,
+    generator?.lightnessMax || 85
+  );
 
   return Color.hsl(h, s, l);
 };
 
-export const generateTheme = (scheme, withNeutral, baseColorHex) => {
-  const color = baseColorHex ? Color(baseColorHex) : generateRandomColor();
+export const generateTheme = (scheme, withNeutral, baseColorHex, generator) => {
+  const color = baseColorHex
+    ? Color(baseColorHex)
+    : generateRandomColor(generator);
   const colors = [];
 
   if (scheme === "monochromatic") {
-    colors.push({ name: "primary", color: color.hex() });
+    colors.push({ name: "color-primary", color: color.hex() });
   } else if (scheme === "analogous") {
     const leftColor = color.hue(color.hue() - 30);
     const rightColor = color.hue(color.hue() + 30);
-    colors.push({ name: "secondary-left", color: leftColor.hex() });
-    colors.push({ name: "primary", color: color.hex() });
-    colors.push({ name: "secondary-right", color: rightColor.hex() });
+    colors.push({ name: "color-secondary-left", color: leftColor.hex() });
+    colors.push({ name: "color-primary", color: color.hex() });
+    colors.push({ name: "color-secondary-right", color: rightColor.hex() });
   } else if (scheme === "complementary") {
     const complementColor = color.hue(color.hue() + 180);
-    colors.push({ name: "primary", color: color.hex() });
-    colors.push({ name: "complement", color: complementColor.hex() });
+    colors.push({ name: "color-primary", color: color.hex() });
+    colors.push({ name: "color-complement", color: complementColor.hex() });
   } else if (scheme === "split-complementary") {
     const complementColor = color.hue(color.hue() + 180);
     const leftColor = complementColor.hue(complementColor.hue() - 30);
     const rightColor = complementColor.hue(complementColor.hue() + 30);
-    colors.push({ name: "complement-left", color: leftColor.hex() });
-    colors.push({ name: "primary", color: color.hex() });
-    colors.push({ name: "complement-right", color: rightColor.hex() });
+    colors.push({ name: "color-complement-left", color: leftColor.hex() });
+    colors.push({ name: "color-primary", color: color.hex() });
+    colors.push({ name: "color-complement-right", color: rightColor.hex() });
   } else if (scheme === "tetradic") {
     const color1 = color.hue(color.hue() + 60);
     const color2 = color.hue(color.hue() + 180);

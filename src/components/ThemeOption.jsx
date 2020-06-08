@@ -2,10 +2,23 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { calculateColor } from "../utils";
 
-const ThemeOption = ({ theme, isActive, ...rest }) => {
+const ThemeOption = ({ theme, isActive, onDelete, ...rest }) => {
   return (
     <ElContainer isActive={isActive} {...rest}>
-      <ElTitle>{theme.name || "Untitled Theme"}</ElTitle>
+      <ElTitle>
+        <div>{theme.name || "Untitled Theme"}</div>
+        {onDelete && (
+          <ElDelete
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            ✕
+          </ElDelete>
+        )}
+      </ElTitle>
       <ElColors>
         {theme.colors.map((color, colorIndex) => (
           <ElColor style={{ backgroundColor: color.color }} key={colorIndex}>
@@ -51,6 +64,19 @@ const ElContainer = styled.div`
 
 const ElTitle = styled.div`
   height: 30px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+`;
+
+const ElDelete = styled.div`
+  cursor: pointer;
+  font-weight: 700;
+
+  &:hover {
+    color: var(--color-error-400);
+  }
 `;
 
 const ElColors = styled.div`

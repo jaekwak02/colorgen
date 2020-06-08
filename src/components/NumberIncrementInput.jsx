@@ -4,21 +4,27 @@ import styled from "styled-components";
 const NumberIncrementInput = ({
   value = 0,
   increment = 1,
+  showValue = true,
+  incrementSymbol = "+",
+  decrementSymbol = "–",
   onChange = () => null,
   formatter = (x) => x,
 }) => {
   return (
     <ElContainer>
-      <ElIncrement onClick={() => onChange(value + increment)}>+</ElIncrement>
-      <ElContent>{formatter(value)}</ElContent>
-      <ElIncrement onClick={() => onChange(value - increment)}>–</ElIncrement>
+      <ElIncrement onClick={() => onChange(value + increment, +increment)}>
+        {incrementSymbol}
+      </ElIncrement>
+      {showValue ? <ElContent>{formatter(value)}</ElContent> : <div />}
+      <ElIncrement onClick={() => onChange(value - increment, -increment)}>
+        {decrementSymbol}
+      </ElIncrement>
     </ElContainer>
   );
 };
 
 const ElContainer = styled.div`
   width: 50px;
-  border: 1px solid var(--color-neutral-500);
 
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
@@ -28,6 +34,7 @@ const ElContainer = styled.div`
 
 const ElIncrement = styled.div`
   background-color: var(--color-neutral-300);
+  border: 1px solid var(--color-neutral-500);
 
   font-weight: 700;
 
@@ -48,8 +55,8 @@ const ElIncrement = styled.div`
 
 const ElContent = styled.div`
   background-color: var(--color-neutral-300);
-  border-top: 1px solid var(--color-neutral-500);
-  border-bottom: 1px solid var(--color-neutral-500);
+  border-left: 1px solid var(--color-neutral-500);
+  border-right: 1px solid var(--color-neutral-500);
 
   display: grid;
   align-items: center;

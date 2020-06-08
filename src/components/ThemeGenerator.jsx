@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Color from "color";
 import Joi from "@hapi/joi";
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
@@ -18,9 +17,15 @@ const schemeOptions = [
 ];
 
 const generatorSchema = Joi.object({
-  scheme: Joi.string(),
-  base: Joi.string(),
-  locked: Joi.bool(),
+  scheme: Joi.string().allow("").default(""),
+  base: Joi.string().allow("").default(""),
+  locked: Joi.bool().default(false),
+  hueMin: Joi.number().default(0),
+  hueMax: Joi.number().default(360),
+  saturationMin: Joi.number().default(15),
+  saturationMax: Joi.number().default(100),
+  lightnessMin: Joi.number().default(15),
+  lightnessMax: Joi.number().default(85),
 });
 
 const ThemeGenerator = ({
@@ -30,8 +35,10 @@ const ThemeGenerator = ({
   onColorClick,
 }) => {
   const { value: generator } = generatorSchema.validate(theme.generator || {}, {
-    allowUnknown: false,
+    allowUnknown: true,
   });
+
+  console.log({ generator });
 
   const [baseColorInput, setBaseColorInput] = useState(generator.base);
 
@@ -79,6 +86,40 @@ const ThemeGenerator = ({
                 </ElBaseIndicator>
               </HorizontalLayout>
             </VerticalLayout>
+            {/* <VerticalLayout>
+              <RangeInput
+                value={[generator.hueMin, generator.hueMax]}
+                label="Hue Range"
+                max={360}
+                onChange={([hueMin, hueMax]) =>
+                  onGeneratorChange({ ...generator, hueMin, hueMax })
+                }
+              />
+              <RangeInput
+                value={[generator.saturationMin, generator.saturationMax]}
+                label="Saturation Range"
+                max={100}
+                onChange={([saturationMin, saturationMax]) =>
+                  onGeneratorChange({
+                    ...generator,
+                    saturationMin,
+                    saturationMax,
+                  })
+                }
+              />
+              <RangeInput
+                value={[generator.lightnessMin, generator.lightnessMax]}
+                label="Lightness Range"
+                max={100}
+                onChange={([lightnessMin, lightnessMax]) =>
+                  onGeneratorChange({
+                    ...generator,
+                    lightnessMin,
+                    lightnessMax,
+                  })
+                }
+              />
+            </VerticalLayout> */}
           </HorizontalLayout>
         )}
 
@@ -89,7 +130,8 @@ const ThemeGenerator = ({
                 const colors = generateTheme(
                   generator.scheme,
                   true,
-                  generator.base
+                  generator.base,
+                  generator
                 );
 
                 onGenerate(colors);
@@ -106,51 +148,15 @@ const ThemeGenerator = ({
               });
             }}
           >
-            {generator.locked ? "Unlock" : "Lock"}
+            {generator.locked ? "Unlock Generator" : "Lock"}
           </Button>
         </HorizontalLayout>
-
-        <ElColors>
-          {theme.colors.map((color, colorIndex) => {
-            const isDark = Color(color.color).isDark();
-
-            return (
-              <ElColor
-                key={colorIndex}
-                style={{
-                  backgroundColor: color.color,
-                  color: isDark ? "white" : "black",
-                }}
-              >
-                {color.color}
-              </ElColor>
-            );
-          })}
-        </ElColors>
       </VerticalLayout>
     </ElContainer>
   );
 };
 
 const ElContainer = styled.div``;
-
-const ElColors = styled.div`
-  border: 1px solid var(--color-neutral-600);
-  background-color: var(--color-neutral-600);
-
-  display: grid;
-  gap: 1px;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-`;
-
-const ElColor = styled.div`
-  height: 120px;
-
-  display: grid;
-  align-items: center;
-  justify-items: center;
-`;
 
 const ElBaseIndicator = styled.div`
   height: 30px;

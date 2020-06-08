@@ -1,14 +1,14 @@
 import React, { useReducer, useEffect } from "react";
 import styled from "styled-components";
-import color from "color";
+import Color from "color";
 import MarkerContainer from "./MarkerContainer";
-import TextInput from "./TextInput";
+import TextInput from "../components/TextInput";
 import { isValidColorHex } from "../utils";
 import { lerp } from "../utils/utils";
 
 const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
   const size = 400;
-  const sizeHue = 60;
+  const sizeSecondary = 60;
 
   const [state, dispatch] = useReducer(
     (state, action) => {
@@ -41,7 +41,7 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
           return { ...state };
         }
         case "SET_HUE_POSITION": {
-          const hue = color("#ff0000")
+          const hue = Color("#ff0000")
             .rotate((data[1] / size) * 360)
             .hex();
 
@@ -99,7 +99,7 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
           width={size}
           height={size}
           style={{
-            backgroundColor: color(pickerColor),
+            backgroundColor: Color(pickerColor),
           }}
         >
           <ElColorPickerBackground
@@ -125,7 +125,7 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
           setPosition={(p) => {
             dispatch(["SET_HUE_POSITION", p]);
           }}
-          width={sizeHue}
+          width={sizeSecondary}
           height={size}
           style={{
             background:
@@ -133,6 +133,42 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
           }}
         >
           <ElColorPickerHueMarker style={{ top: `${huePosition[1] / 4}%` }} />
+        </MarkerContainer>
+        <MarkerContainer
+          position={[0, size - markerPosition[0]]}
+          setPosition={(p) => {
+            dispatch(["SET_MARKER_POSITION", [size - p[1], markerPosition[1]]]);
+          }}
+          width={sizeSecondary}
+          height={size}
+          style={{
+            background: `linear-gradient(to bottom, ${Color(pickerColor)
+              .mix(Color("#000000"), markerPosition[1] / size)
+              .hex()}, ${Color("#ffffff")
+              .mix(Color("#000000"), markerPosition[1] / size)
+              .hex()})`,
+          }}
+        >
+          <ElColorPickerHueMarker
+            style={{ top: `${(size - markerPosition[0]) / 4}%` }}
+          />
+        </MarkerContainer>
+        <MarkerContainer
+          position={[0, markerPosition[1]]}
+          setPosition={(p) => {
+            dispatch(["SET_MARKER_POSITION", [markerPosition[0], p[1]]]);
+          }}
+          width={sizeSecondary}
+          height={size}
+          style={{
+            background: `linear-gradient(to bottom, ${Color(pickerColor)
+              .mix(Color("#ffffff"), 1 - markerPosition[0] / size)
+              .hex()}, #000000`,
+          }}
+        >
+          <ElColorPickerHueMarker
+            style={{ top: `${markerPosition[1] / 4}%` }}
+          />
         </MarkerContainer>
       </ElColorPickerTopRow>
       <ElColorPickerBottomRow>
@@ -151,23 +187,23 @@ const getSelectedColor = (state, size) => {
   const x = state.markerPosition[0] / size;
   const y = state.markerPosition[1] / size;
 
-  const rgb = color(state.pickerColor).rgb().array();
+  const rgb = Color(state.pickerColor).rgb().array();
   const r = lerp(lerp(255, rgb[0], x), 0, y);
   const g = lerp(lerp(255, rgb[1], x), 0, y);
   const b = lerp(lerp(255, rgb[2], x), 0, y);
-  const selectedColor = color([r, g, b]).hex();
+  const selectedColor = Color([r, g, b]).hex();
 
   return selectedColor;
 };
 
 const getParameters = (baseColor, size) => {
-  const defaultHuePosition = (color(baseColor).hue() / 360) * size;
-  const defaultHue = color("#ff0000")
+  const defaultHuePosition = (Color(baseColor).hue() / 360) * size;
+  const defaultHue = Color("#ff0000")
     .rotate((defaultHuePosition / size) * 360)
     .hex();
 
-  const hueRGB = color(defaultHue).rgb().array();
-  const base = color(baseColor).rgb().array();
+  const hueRGB = Color(defaultHue).rgb().array();
+  const base = Color(baseColor).rgb().array();
   const max = Math.max(...base);
   const y = size - (max / 255) * size;
   const baseSaturated = base.map((x) => (x * 255) / max);
@@ -196,10 +232,9 @@ const ElColorPickerContainer = styled.div`
 
 const ElColorPickerTopRow = styled.div`
   display: grid;
-  grid-gap: 30px;
   grid-auto-flow: column;
   align-items: flex-start;
-  justify-items: flex-start;
+  justify-content: space-between;
 `;
 
 const ElColorPickerBottomRow = styled.div`

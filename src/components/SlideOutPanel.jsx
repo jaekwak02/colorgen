@@ -43,7 +43,7 @@ const StyledContainer = styled.div`
   top: 0px;
   right: 0px;
   bottom: 0px;
-  width: 600px;
+  width: 800px;
   background-color: var(--color-neutral-400);
   border-left: 1px solid var(--color-neutral-500);
   box-shadow: var(--box-shadow-3);
