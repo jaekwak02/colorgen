@@ -111,6 +111,8 @@ a:hover {
 
 body {
   background-color: var(--color-neutral-400);
+
+  overflow-y: scroll;
 }
 
 .large-header {

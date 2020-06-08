@@ -296,7 +296,7 @@ const HomePage = () => {
               </VerticalLayout>
             }
           >
-            <h3>1. Generate</h3>
+            <h2>1. Generate</h2>
             <ThemeGenerator
               theme={state.theme}
               onGeneratorChange={(generator) =>
@@ -304,7 +304,7 @@ const HomePage = () => {
               }
               onGenerate={(colors) => dispatch("GENERATED", [colors])}
             />
-            <h3>2. Adjust</h3>
+            <h2>2. Adjust</h2>
             <ColorDisplay
               theme={state.theme}
               onColorClick={(colorIndex) =>
@@ -393,7 +393,7 @@ const HomePage = () => {
             <div>
               <Button onClick={() => dispatch("ADD_COLOR")}>Add Color</Button>
             </div>
-            <h3>3. Export</h3>
+            <h2>3. Export</h2>
             <div>
               <VerticalLayout>
                 {state.theme.colors.map((color, colorIndex) => (
@@ -419,7 +419,7 @@ const HomePage = () => {
           >
             {state.theme.colors[state.editingIndex] && (
               <React.Fragment key={`${state.isEditing}|${state.editingIndex}`}>
-                <VerticalLayout>
+                <VerticalLayout style={{ gap: 30 }}>
                   <h2>Color Picker</h2>
                   <ColorPicker
                     color={state.theme.colors[state.editingIndex].color}
@@ -448,6 +448,22 @@ const HomePage = () => {
                     }
                     formatter={(n) => n + 1}
                   />
+                  <ColorCellLayout>
+                    {colorSegments[state.editingIndex].map(
+                      (segmentDelta, segmentIndex) => (
+                        <ColorCell
+                          key={segmentIndex}
+                          color={calculateColor(
+                            state.theme.colors[state.editingIndex].color,
+                            segmentDelta
+                          )}
+                          isIndex={segmentDelta === 0}
+                          isEditing
+                          delta={segmentDelta}
+                        />
+                      )
+                    )}
+                  </ColorCellLayout>
                 </VerticalLayout>
               </React.Fragment>
             )}
