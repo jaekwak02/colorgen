@@ -92,6 +92,17 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
 
   return (
     <ElColorPickerContainer>
+      <ElColorSelection
+        style={{
+          backgroundColor: state.selectedColor,
+          color: Color(state.selectedColor).isDark() ? "white" : "black",
+          // color: Color(state.selectedColor).isDark()
+          //   ? "var(--color-neutral-900)"
+          //   : "var(--color-neutral-200)",
+        }}
+      >
+        {state.selectedColor}
+      </ElColorSelection>
       <ElColorPickerTopRow>
         <MarkerContainer
           position={markerPosition}
@@ -226,8 +237,15 @@ const getParameters = (baseColor, size) => {
 
 const ElColorPickerContainer = styled.div`
   display: grid;
-  grid-gap: 15px;
+  grid-gap: 30px;
   align-items: flex-start;
+`;
+
+const ElColorSelection = styled.div`
+  height: 90px;
+  display: grid;
+  align-items: center;
+  justify-items: center;
 `;
 
 const ElColorPickerTopRow = styled.div`

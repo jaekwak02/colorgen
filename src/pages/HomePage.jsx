@@ -231,7 +231,7 @@ const HomePage = () => {
         <TabPanel>
           <SidebarLayout
             rightSidebar={
-              <>
+              <VerticalLayout style={{ gap: 30 }}>
                 <VerticalLayout style={{ position: "relative" }}>
                   <HorizontalLayout>
                     <div>{state.saveKey ? "Current Save" : "New Save"}</div>
@@ -293,7 +293,7 @@ const HomePage = () => {
                     )
                   )}
                 </ThemeLayout>
-              </>
+              </VerticalLayout>
             }
           >
             <h3>1. Generate</h3>
@@ -338,49 +338,54 @@ const HomePage = () => {
                         )
                       )}
                     </ColorCellLayout>
-                    <NumberIncrementInput
-                      value={color.increment}
-                      increment={0.5}
-                      onChange={(n) => {
-                        setQuickEditedIndex(colorIndex);
-                        setQuickEditedCount((x) => x + 1);
-                        dispatch("SET_COLOR_INCREMENT", [colorIndex, n]);
-                      }}
-                      formatter={(n) => `${n}%`}
-                    />
-                    <NumberIncrementInput
-                      value={color.index}
-                      onChange={(n) => {
-                        setQuickEditedIndex(colorIndex);
-                        setQuickEditedCount((x) => x + 1);
-                        dispatch("SET_COLOR_INDEX", [colorIndex, n]);
-                      }}
-                      formatter={(n) => n + 1}
-                    />
-                    <NumberIncrementInput
-                      value={colorIndex}
-                      onChange={(n) =>
-                        dispatch("REORDER_COLOR", [colorIndex, n - colorIndex])
-                      }
-                      showValue={false}
-                      incrementSymbol="⮝"
-                      decrementSymbol="⮟"
-                    />
-                    <VerticalLayout style={{ alignContent: "center" }}>
-                      <Button
-                        onClick={() =>
-                          dispatch("START_DELETE_COLOR", [colorIndex])
-                        }
-                        style={{
-                          height: 40,
-                          width: 40,
-                          borderRadius: 20,
-                          padding: 0,
+                    <HorizontalLayout style={{ alignItems: "stretch" }}>
+                      <NumberIncrementInput
+                        value={color.increment}
+                        increment={0.5}
+                        onChange={(n) => {
+                          setQuickEditedIndex(colorIndex);
+                          setQuickEditedCount((x) => x + 1);
+                          dispatch("SET_COLOR_INCREMENT", [colorIndex, n]);
                         }}
-                      >
-                        ✕
-                      </Button>
-                    </VerticalLayout>
+                        formatter={(n) => `${n}%`}
+                      />
+                      <NumberIncrementInput
+                        value={color.index}
+                        onChange={(n) => {
+                          setQuickEditedIndex(colorIndex);
+                          setQuickEditedCount((x) => x + 1);
+                          dispatch("SET_COLOR_INDEX", [colorIndex, n]);
+                        }}
+                        formatter={(n) => n + 1}
+                      />
+                      <NumberIncrementInput
+                        value={colorIndex}
+                        onChange={(n) =>
+                          dispatch("REORDER_COLOR", [
+                            colorIndex,
+                            n - colorIndex,
+                          ])
+                        }
+                        showValue={false}
+                        incrementSymbol="⮝"
+                        decrementSymbol="⮟"
+                      />
+                      <VerticalLayout style={{ alignContent: "center" }}>
+                        <Button
+                          onClick={() =>
+                            dispatch("START_DELETE_COLOR", [colorIndex])
+                          }
+                          style={{
+                            height: 40,
+                            width: 40,
+                            borderRadius: 20,
+                            padding: 0,
+                          }}
+                        >
+                          ✕
+                        </Button>
+                      </VerticalLayout>
+                    </HorizontalLayout>
                   </ColorRow>
                 </div>
               );
@@ -409,19 +414,13 @@ const HomePage = () => {
 
           <SlideOutPanel
             isOpen={state.isEditing}
+            width={730}
             onClose={() => dispatch("STOP_EDIT")}
           >
             {state.theme.colors[state.editingIndex] && (
               <React.Fragment key={`${state.isEditing}|${state.editingIndex}`}>
                 <VerticalLayout>
                   <h2>Color Picker</h2>
-                  <div
-                    style={{
-                      height: 60,
-                      backgroundColor:
-                        state.theme.colors[state.editingIndex].color,
-                    }}
-                  />
                   <ColorPicker
                     color={state.theme.colors[state.editingIndex].color}
                     setColor={(newColor) =>

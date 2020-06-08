@@ -25,8 +25,6 @@ const ColorCell = ({ color, isIndex, isEditing, delta }) => {
 
 const StyledContainer = styled.div`
   position: relative;
-  height: 80px;
-  width: 80px;
 
   display: grid;
   justify-items: center;

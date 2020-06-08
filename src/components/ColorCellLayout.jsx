@@ -18,9 +18,9 @@ const StyledContainer = styled.div`
 
   display: grid;
   grid-auto-flow: column;
+  grid-auto-rows: 80px;
+  grid-auto-columns: minmax(0, 80px);
   gap: 1px;
-  align-items: center;
-  justify-content: start;
   justify-self: start;
 
   ${(props) =>

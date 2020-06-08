@@ -6,6 +6,8 @@ const TabPanel = (props) => <ElContainer {...props} />;
 TabPanel.displayName = "TabPanel";
 
 const ElContainer = styled.div`
+  position: relative;
+
   display: grid;
   gap: 30px;
 `;

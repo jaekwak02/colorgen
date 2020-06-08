@@ -2,7 +2,13 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 
-const SlideOutPanel = ({ isOpen, onClose, children }) => {
+const SlideOutPanel = ({
+  isOpen,
+  onClose,
+  width = 800,
+  darken = false,
+  children,
+}) => {
   useEffect(() => {
     const listener = (e) => {
       if (e.key === "Escape") {
@@ -17,10 +23,20 @@ const SlideOutPanel = ({ isOpen, onClose, children }) => {
 
   return ReactDOM.createPortal(
     <>
-      {isOpen && <StyledBackground onClick={() => onClose()} />}
+      {isOpen && (
+        <StyledBackground
+          onClick={() => onClose()}
+          style={{
+            backgroundColor: darken ? "rgba(0, 0, 0, 0.5)" : "transparent",
+          }}
+        />
+      )}
 
       <StyledContainer
-        style={{ transform: isOpen ? "translateX(0%)" : "translateX(100%)" }}
+        style={{
+          transform: isOpen ? "translateX(0%)" : "translateX(100%)",
+          width,
+        }}
       >
         <StyledContent>{children}</StyledContent>
         <StyledCloseAction onClick={() => onClose()}>Close</StyledCloseAction>
@@ -43,7 +59,6 @@ const StyledContainer = styled.div`
   top: 0px;
   right: 0px;
   bottom: 0px;
-  width: 800px;
   background-color: var(--color-neutral-400);
   border-left: 1px solid var(--color-neutral-500);
   box-shadow: var(--box-shadow-3);
