@@ -3,12 +3,16 @@ import styled from "styled-components";
 import Responsive from "../components/Responsive";
 import SlideOutPanel from "../components/SlideOutPanel";
 import Button from "../components/Button";
+import { useResponsive } from "../hooks";
 
 const SidebarLayout = ({ leftSidebar, rightSidebar, children }) => {
-  const columns =
-    (leftSidebar ? "auto " : "") +
-    "minmax(0, 1fr)" +
-    (rightSidebar ? " auto" : "");
+  const isDesktop = useResponsive({ minWidth: 1200 });
+
+  const columns = isDesktop
+    ? (leftSidebar ? "auto " : "") +
+      "minmax(0, 1fr)" +
+      (rightSidebar ? " auto" : "")
+    : "minmax(0, 1fr)";
 
   const [isOpen, setIsOpen] = useState(false);
 

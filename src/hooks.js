@@ -3,12 +3,6 @@ import { useMediaQuery } from "react-responsive";
 import { NotificationContext } from "./project/NotificationManager";
 import { useContext } from "react";
 
-const MEDIA_QUERY_SIZES = {
-  small: 500,
-  medium: 750,
-  large: 1150,
-};
-
 export const useForceUpdate = () => {
   const [, setIncrement] = useState(0);
 
@@ -17,16 +11,12 @@ export const useForceUpdate = () => {
   return callback;
 };
 
-export const useResponsive = (size) => {
-  const forceUpdate = useForceUpdate();
+export const useResponsive = ({ minWidth, maxWidth }) => {
+  const query = {};
+  if (minWidth) query.minWidth = minWidth;
+  if (maxWidth) query.maxWidth = maxWidth;
 
-  const query = MEDIA_QUERY_SIZES[size];
-
-  if (!query) {
-    throw new Error(`size "${size}" is not a valid size`);
-  }
-
-  return useMediaQuery({ query }, undefined, () => console.log("TEST"));
+  return useMediaQuery(query);
 };
 
 export const useNotificationContext = () => useContext(NotificationContext);

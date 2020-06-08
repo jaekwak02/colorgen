@@ -96,9 +96,6 @@ const ColorPicker = ({ color: defaultColor = "#ff0000", setColor }) => {
         style={{
           backgroundColor: state.selectedColor,
           color: Color(state.selectedColor).isDark() ? "white" : "black",
-          // color: Color(state.selectedColor).isDark()
-          //   ? "var(--color-neutral-900)"
-          //   : "var(--color-neutral-200)",
         }}
       >
         {state.selectedColor}
