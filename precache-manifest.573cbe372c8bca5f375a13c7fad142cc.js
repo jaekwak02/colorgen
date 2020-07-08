@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "45fc828207d45f81d6b827ec8c0ff0e2",
+    "revision": "9f6081e24dbfc889074a4d99c9689b0d",
     "url": "/colorgen/index.html"
   },
   {
-    "revision": "4c07faa8bd660c072750",
+    "revision": "0c099dd69504579d4b78",
     "url": "/colorgen/static/css/2.e6f31816.chunk.css"
   },
   {
-    "revision": "93d8ae4d07a0482c66e2",
+    "revision": "9fbdbcf435e820908ee7",
     "url": "/colorgen/static/css/main.7217d769.chunk.css"
   },
   {
-    "revision": "4c07faa8bd660c072750",
-    "url": "/colorgen/static/js/2.25c150ea.chunk.js"
+    "revision": "0c099dd69504579d4b78",
+    "url": "/colorgen/static/js/2.0fea17db.chunk.js"
   },
   {
     "revision": "6fdbdd9035d9c4755b65d82c407f59cd",
-    "url": "/colorgen/static/js/2.25c150ea.chunk.js.LICENSE.txt"
+    "url": "/colorgen/static/js/2.0fea17db.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "93d8ae4d07a0482c66e2",
-    "url": "/colorgen/static/js/main.672f30be.chunk.js"
+    "revision": "9fbdbcf435e820908ee7",
+    "url": "/colorgen/static/js/main.9cd2a933.chunk.js"
   },
   {
     "revision": "dc6dc55741556c882624",
