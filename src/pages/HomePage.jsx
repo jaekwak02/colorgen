@@ -20,15 +20,13 @@ import Tab from "../components/Tab";
 import TabPanel from "../components/TabPanel";
 import VerticalLayout from "../components/VerticalLayout";
 import HorizontalLayout from "../components/HorizontalLayout";
-import SidebarLayout from "../components/SidebarLayout";
 import Divider from "../components/Divider";
-import Badge from "../components/Badge";
 import ThemeGenerator from "../components/ThemeGenerator";
 import Modal from "../components/Modal";
+import CurrentSave from "../components/CurrentSave";
 import {
   calculateColor,
   getSavedThemes,
-  saveTheme,
   deleteTheme,
   generateTheme,
 } from "../utils";
@@ -229,188 +227,116 @@ const HomePage = () => {
       <TabLayout>
         <Tab>Generator</Tab>
         <TabPanel>
-          <SidebarLayout
-            rightSidebar={
-              <VerticalLayout style={{ gap: 30 }}>
-                <VerticalLayout style={{ position: "relative" }}>
-                  <HorizontalLayout>
-                    <div>{state.saveKey ? "Current Save" : "New Save"}</div>
-                    {state.saved ? (
-                      <Badge success>Saved</Badge>
-                    ) : (
-                      <Badge error>Unsaved</Badge>
+          <CurrentSave state={state} dispatch={dispatch} />
+          <h2>1. Generate</h2>
+          <ThemeGenerator
+            theme={state.theme}
+            onGeneratorChange={(generator) =>
+              dispatch("SET_GENERATOR", [generator])
+            }
+            onGenerate={(colors) => dispatch("GENERATED", [colors])}
+          />
+          <h2>2. Adjust</h2>
+          <ColorDisplay
+            theme={state.theme}
+            onColorClick={(colorIndex) => dispatch("START_EDIT", [colorIndex])}
+          />
+          {state.theme.colors.map((color, colorIndex) => {
+            const isEditing =
+              state.isEditing && state.editingIndex === colorIndex;
+            const quickEditing = quickEditedIndex === colorIndex;
+
+            return (
+              <div key={colorIndex}>
+                <ColorRow>
+                  <ColorCellLayout
+                    isEditing={isEditing}
+                    onClick={() => dispatch("START_EDIT", [colorIndex])}
+                  >
+                    <ColorCell color={color.color} />
+                  </ColorCellLayout>
+                  <ColorCellLayout>
+                    {colorSegments[colorIndex].map(
+                      (segmentDelta, segmentIndex) => (
+                        <ColorCell
+                          key={segmentIndex}
+                          color={calculateColor(color.color, segmentDelta)}
+                          isIndex={segmentDelta === 0}
+                          isEditing={isEditing || quickEditing}
+                          delta={segmentDelta}
+                        />
+                      )
                     )}
+                  </ColorCellLayout>
+                  <HorizontalLayout style={{ alignItems: "stretch" }}>
+                    <NumberIncrementInput
+                      value={color.increment}
+                      increment={0.5}
+                      onChange={(n) => {
+                        setQuickEditedIndex(colorIndex);
+                        setQuickEditedCount((x) => x + 1);
+                        dispatch("SET_COLOR_INCREMENT", [colorIndex, n]);
+                      }}
+                      formatter={(n) => `${n}%`}
+                    />
+                    <NumberIncrementInput
+                      value={color.index}
+                      onChange={(n) => {
+                        setQuickEditedIndex(colorIndex);
+                        setQuickEditedCount((x) => x + 1);
+                        dispatch("SET_COLOR_INDEX", [colorIndex, n]);
+                      }}
+                      formatter={(n) => n + 1}
+                    />
+                    <NumberIncrementInput
+                      value={colorIndex}
+                      onChange={(n) =>
+                        dispatch("REORDER_COLOR", [colorIndex, n - colorIndex])
+                      }
+                      showValue={false}
+                      incrementSymbol="⮝"
+                      decrementSymbol="⮟"
+                    />
+                    <VerticalLayout style={{ alignContent: "center" }}>
+                      <Button
+                        onClick={() =>
+                          dispatch("START_DELETE_COLOR", [colorIndex])
+                        }
+                        style={{
+                          height: 40,
+                          width: 40,
+                          borderRadius: 20,
+                          padding: 0,
+                        }}
+                      >
+                        ✕
+                      </Button>
+                    </VerticalLayout>
                   </HorizontalLayout>
+                </ColorRow>
+              </div>
+            );
+          })}
+          <div>
+            <Button onClick={() => dispatch("ADD_COLOR")}>Add Color</Button>
+          </div>
+          <h2>3. Export</h2>
+          <div>
+            <VerticalLayout>
+              {state.theme.colors.map((color, colorIndex) => (
+                <HorizontalLayout key={colorIndex}>
+                  <ColorCellSmall style={{ backgroundColor: color.color }} />
                   <TextInput
-                    value={state.theme.name}
-                    onChange={(e) => dispatch("SET_NAME", [e.target.value])}
-                    placeholder="Theme Name"
-                  />
-                  <HorizontalLayout>
-                    <Button
-                      isDisabled={!state.saveKey}
-                      onClick={() => {
-                        const key = saveTheme(state.theme, state.saveKey);
-                        notification.send("Saved!");
-                        dispatch("SAVED", [key]);
-                      }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        const key = saveTheme(state.theme, null);
-                        notification.send("Saved as a New Theme!");
-                        dispatch("SAVED", [key]);
-                      }}
-                    >
-                      Save As New
-                    </Button>
-                  </HorizontalLayout>
-                </VerticalLayout>
-                <Divider />
-                {state.saveKey && (
-                  <ThemeOption
-                    isActive
-                    theme={
-                      state.savedThemes.find(
-                        (save) => save.key === state.saveKey
-                      ).theme
+                    value={color.name}
+                    onChange={(e) =>
+                      dispatch("SET_COLOR_NAME", [colorIndex, e.target.value])
                     }
                   />
-                )}
-                {state.saveKey && <Divider />}
-                <ThemeLayout>
-                  {state.savedThemes.map((save, themeIndex) =>
-                    save.key === state.saveKey ? null : (
-                      <ThemeOption
-                        key={themeIndex}
-                        isActive={save.key === state.saveKey}
-                        theme={save.theme}
-                        onClick={() => dispatch("LOAD", [save.key, save.theme])}
-                        onDelete={() => dispatch("START_DELETE", [save.key])}
-                      />
-                    )
-                  )}
-                </ThemeLayout>
-              </VerticalLayout>
-            }
-          >
-            <h2>1. Generate</h2>
-            <ThemeGenerator
-              theme={state.theme}
-              onGeneratorChange={(generator) =>
-                dispatch("SET_GENERATOR", [generator])
-              }
-              onGenerate={(colors) => dispatch("GENERATED", [colors])}
-            />
-            <h2>2. Adjust</h2>
-            <ColorDisplay
-              theme={state.theme}
-              onColorClick={(colorIndex) =>
-                dispatch("START_EDIT", [colorIndex])
-              }
-            />
-            {state.theme.colors.map((color, colorIndex) => {
-              const isEditing =
-                state.isEditing && state.editingIndex === colorIndex;
-              const quickEditing = quickEditedIndex === colorIndex;
-
-              return (
-                <div key={colorIndex}>
-                  <ColorRow>
-                    <ColorCellLayout
-                      isEditing={isEditing}
-                      onClick={() => dispatch("START_EDIT", [colorIndex])}
-                    >
-                      <ColorCell color={color.color} />
-                    </ColorCellLayout>
-                    <ColorCellLayout>
-                      {colorSegments[colorIndex].map(
-                        (segmentDelta, segmentIndex) => (
-                          <ColorCell
-                            key={segmentIndex}
-                            color={calculateColor(color.color, segmentDelta)}
-                            isIndex={segmentDelta === 0}
-                            isEditing={isEditing || quickEditing}
-                            delta={segmentDelta}
-                          />
-                        )
-                      )}
-                    </ColorCellLayout>
-                    <HorizontalLayout style={{ alignItems: "stretch" }}>
-                      <NumberIncrementInput
-                        value={color.increment}
-                        increment={0.5}
-                        onChange={(n) => {
-                          setQuickEditedIndex(colorIndex);
-                          setQuickEditedCount((x) => x + 1);
-                          dispatch("SET_COLOR_INCREMENT", [colorIndex, n]);
-                        }}
-                        formatter={(n) => `${n}%`}
-                      />
-                      <NumberIncrementInput
-                        value={color.index}
-                        onChange={(n) => {
-                          setQuickEditedIndex(colorIndex);
-                          setQuickEditedCount((x) => x + 1);
-                          dispatch("SET_COLOR_INDEX", [colorIndex, n]);
-                        }}
-                        formatter={(n) => n + 1}
-                      />
-                      <NumberIncrementInput
-                        value={colorIndex}
-                        onChange={(n) =>
-                          dispatch("REORDER_COLOR", [
-                            colorIndex,
-                            n - colorIndex,
-                          ])
-                        }
-                        showValue={false}
-                        incrementSymbol="⮝"
-                        decrementSymbol="⮟"
-                      />
-                      <VerticalLayout style={{ alignContent: "center" }}>
-                        <Button
-                          onClick={() =>
-                            dispatch("START_DELETE_COLOR", [colorIndex])
-                          }
-                          style={{
-                            height: 40,
-                            width: 40,
-                            borderRadius: 20,
-                            padding: 0,
-                          }}
-                        >
-                          ✕
-                        </Button>
-                      </VerticalLayout>
-                    </HorizontalLayout>
-                  </ColorRow>
-                </div>
-              );
-            })}
-            <div>
-              <Button onClick={() => dispatch("ADD_COLOR")}>Add Color</Button>
-            </div>
-            <h2>3. Export</h2>
-            <div>
-              <VerticalLayout>
-                {state.theme.colors.map((color, colorIndex) => (
-                  <HorizontalLayout key={colorIndex}>
-                    <ColorCellSmall style={{ backgroundColor: color.color }} />
-                    <TextInput
-                      value={color.name}
-                      onChange={(e) =>
-                        dispatch("SET_COLOR_NAME", [colorIndex, e.target.value])
-                      }
-                    />
-                  </HorizontalLayout>
-                ))}
-              </VerticalLayout>
-            </div>
-            <CodeBlock text={exportText} />
-          </SidebarLayout>
+                </HorizontalLayout>
+              ))}
+            </VerticalLayout>
+          </div>
+          <CodeBlock text={exportText} />
 
           <SlideOutPanel
             isOpen={state.isEditing}
@@ -468,6 +394,34 @@ const HomePage = () => {
               </React.Fragment>
             )}
           </SlideOutPanel>
+        </TabPanel>
+
+        <Tab>Saves</Tab>
+        <TabPanel>
+          <CurrentSave state={state} dispatch={dispatch} />
+          {state.saveKey && (
+            <ThemeOption
+              isActive
+              theme={
+                state.savedThemes.find((save) => save.key === state.saveKey)
+                  .theme
+              }
+            />
+          )}
+          {state.saveKey && <Divider />}
+          <ThemeLayout>
+            {state.savedThemes.map((save, themeIndex) =>
+              save.key === state.saveKey ? null : (
+                <ThemeOption
+                  key={themeIndex}
+                  isActive={save.key === state.saveKey}
+                  theme={save.theme}
+                  onClick={() => dispatch("LOAD", [save.key, save.theme])}
+                  onDelete={() => dispatch("START_DELETE", [save.key])}
+                />
+              )
+            )}
+          </ThemeLayout>
         </TabPanel>
 
         <Tab>About</Tab>
