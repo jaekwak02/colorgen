@@ -33,6 +33,7 @@ const ThemeOption = ({ theme, isActive, onDelete, ...rest }) => {
 
             return (
               <circle
+                key={colorIndex}
                 r={radius / 2}
                 cx="50"
                 cy="50"
@@ -49,6 +50,7 @@ const ThemeOption = ({ theme, isActive, onDelete, ...rest }) => {
 
             return (
               <path
+                key={colorIndex}
                 d="M 50 50 L 50 0"
                 stroke="currentcolor"
                 strokeWidth="1"
@@ -60,13 +62,14 @@ const ThemeOption = ({ theme, isActive, onDelete, ...rest }) => {
         <ElColors>
           {theme.colors.map((color, colorIndex) => (
             <ElColor key={colorIndex}>
-              <div style={{ width: 100, backgroundColor: color.color }} />
+              <div style={{ width: 90, backgroundColor: color.color }} />
               {[...new Array(9)].map((_, i) => {
                 const delta = (i - color.index) * color.increment;
                 return (
                   <div
                     key={i}
                     style={{
+                      width: 30,
                       backgroundColor: calculateColor(color.color, delta),
                     }}
                   />
@@ -127,7 +130,6 @@ const ElColors = styled.div`
 
   display: grid;
   gap: 1px;
-  grid-auto-columns: 1fr;
 
   transition: 0.25s;
 
@@ -142,17 +144,17 @@ const ElColor = styled.div`
   display: grid;
   gap: 1px;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: auto;
 `;
 
 const ElActiveIndicator = styled.div`
   position: absolute;
-  top: 30px;
-  left: -30px;
+  top: 0px;
+  left: -20px;
 
-  border-right: 15px solid var(--color-neutral-700);
-  border-top: 60px solid transparent;
-  border-bottom: 60px solid transparent;
+  border-right: 20px solid var(--color-neutral-500);
+  border-top: 90px solid transparent;
+  border-bottom: 90px solid transparent;
 `;
 
 export default ThemeOption;

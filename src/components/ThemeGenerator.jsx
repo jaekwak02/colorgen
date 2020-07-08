@@ -38,89 +38,89 @@ const ThemeGenerator = ({
     allowUnknown: true,
   });
 
-  console.log({ generator });
-
   const [baseColorInput, setBaseColorInput] = useState(generator.base);
 
   return (
     <ElContainer>
       <VerticalLayout>
         {!generator.locked && (
-          <HorizontalLayout style={{ alignItems: "start" }}>
-            <VerticalLayout>
-              <div>Scheme</div>
-              <RadioInput
-                value={generator.scheme}
-                onChange={(scheme) =>
-                  onGeneratorChange({ ...generator, scheme })
-                }
-                options={schemeOptions}
-              />
-            </VerticalLayout>
-            <VerticalLayout>
-              <div>Base Color</div>
-              <HorizontalLayout>
-                <TextInput
-                  value={baseColorInput}
-                  onChange={(e) => {
-                    setBaseColorInput(e.target.value);
-
-                    if (
-                      isValidColorHex(e.target.value) ||
-                      e.target.value === ""
-                    ) {
-                      onGeneratorChange({
-                        ...generator,
-                        base: e.target.value.toUpperCase(),
-                      });
-                    }
-                  }}
+          <ElComplicatedContraption>
+            <HorizontalLayout style={{ alignItems: "start" }}>
+              <VerticalLayout>
+                <div>Scheme</div>
+                <RadioInput
+                  value={generator.scheme}
+                  onChange={(scheme) =>
+                    onGeneratorChange({ ...generator, scheme })
+                  }
+                  options={schemeOptions}
                 />
-                <ElBaseIndicator
-                  style={{
-                    backgroundColor:
-                      generator.base || "var(--color-neutral-200)",
-                  }}
-                >
-                  {!generator.base && "✕"}
-                </ElBaseIndicator>
-              </HorizontalLayout>
-            </VerticalLayout>
-            {/* <VerticalLayout>
-              <RangeInput
-                value={[generator.hueMin, generator.hueMax]}
-                label="Hue Range"
-                max={360}
-                onChange={([hueMin, hueMax]) =>
-                  onGeneratorChange({ ...generator, hueMin, hueMax })
-                }
-              />
-              <RangeInput
-                value={[generator.saturationMin, generator.saturationMax]}
-                label="Saturation Range"
-                max={100}
-                onChange={([saturationMin, saturationMax]) =>
-                  onGeneratorChange({
-                    ...generator,
-                    saturationMin,
-                    saturationMax,
-                  })
-                }
-              />
-              <RangeInput
-                value={[generator.lightnessMin, generator.lightnessMax]}
-                label="Lightness Range"
-                max={100}
-                onChange={([lightnessMin, lightnessMax]) =>
-                  onGeneratorChange({
-                    ...generator,
-                    lightnessMin,
-                    lightnessMax,
-                  })
-                }
-              />
-            </VerticalLayout> */}
-          </HorizontalLayout>
+              </VerticalLayout>
+              <VerticalLayout>
+                <div>Base Color</div>
+                <HorizontalLayout>
+                  <TextInput
+                    value={baseColorInput}
+                    onChange={(e) => {
+                      setBaseColorInput(e.target.value);
+
+                      if (
+                        isValidColorHex(e.target.value) ||
+                        e.target.value === ""
+                      ) {
+                        onGeneratorChange({
+                          ...generator,
+                          base: e.target.value.toUpperCase(),
+                        });
+                      }
+                    }}
+                  />
+                  <ElBaseIndicator
+                    style={{
+                      backgroundColor:
+                        generator.base || "var(--color-neutral-200)",
+                    }}
+                  >
+                    {!generator.base && "✕"}
+                  </ElBaseIndicator>
+                </HorizontalLayout>
+              </VerticalLayout>
+              {/* <VerticalLayout>
+                <RangeInput
+                  value={[generator.hueMin, generator.hueMax]}
+                  label="Hue Range"
+                  max={360}
+                  onChange={([hueMin, hueMax]) =>
+                    onGeneratorChange({ ...generator, hueMin, hueMax })
+                  }
+                />
+                <RangeInput
+                  value={[generator.saturationMin, generator.saturationMax]}
+                  label="Saturation Range"
+                  max={100}
+                  onChange={([saturationMin, saturationMax]) =>
+                    onGeneratorChange({
+                      ...generator,
+                      saturationMin,
+                      saturationMax,
+                    })
+                  }
+                />
+                <RangeInput
+                  value={[generator.lightnessMin, generator.lightnessMax]}
+                  label="Lightness Range"
+                  max={100}
+                  onChange={([lightnessMin, lightnessMax]) =>
+                    onGeneratorChange({
+                      ...generator,
+                      lightnessMin,
+                      lightnessMax,
+                    })
+                  }
+                />
+              </VerticalLayout> */}
+            </HorizontalLayout>
+          </ElComplicatedContraption>
         )}
 
         <HorizontalLayout>
@@ -168,6 +168,12 @@ const ElBaseIndicator = styled.div`
   justify-items: center;
 
   user-select: none;
+`;
+
+const ElComplicatedContraption = styled.div`
+  padding: 30px;
+  background: var(--color-neutral-300);
+  border: 1px solid var(--color-neutral-600);
 `;
 
 export default ThemeGenerator;
